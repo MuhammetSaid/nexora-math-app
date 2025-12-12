@@ -1,0 +1,43 @@
+# Backend Python
+Backend/.venv/
+Backend/venv/
+Backend/env/
+Backend/__pycache__/
+Backend/*.pyc
+Backend/.env
+Backend/*.db
+Backend/*.sqlite
+Backend/*.log
+
+# Frontend Flutter
+frontend/build/
+frontend/.dart_tool/
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+frontend/.packages
+frontend/.pub-cache/
+frontend/.pub/
+frontend/build/
+
+# Database
+DB/backups/*.sql
+DB/backups/*.dump
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Environment
+*.env
+!.env.example
+
