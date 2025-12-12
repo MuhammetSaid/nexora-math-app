@@ -1,15 +1,82 @@
 import 'package:flutter/material.dart';
-import 'colors.dart';
 
-/// Uygulama tema yapılandırması
+import '../utils/constants.dart';
+import 'colors.dart';
+import 'text_styles.dart';
+
+/// Uygulama Tema Yapılandırması (Light + Modern Dark)
 class AppTheme {
-  static ThemeData get darkTheme {
+  const AppTheme._();
+
+  /// 🔆 Light Theme (Landing Design)
+  static ThemeData light() {
+    try {
+      final ColorScheme base = const ColorScheme.dark();
+      final ColorScheme colorScheme = base.copyWith(
+        surface: AppColors.surface,
+        primary: AppColors.gold,
+        secondary: AppColors.goldSoft,
+        onPrimary: AppColors.background,
+        onSurface: AppColors.textPrimary,
+      );
+
+      return ThemeData(
+        useMaterial3: true,
+        colorScheme: colorScheme,
+        scaffoldBackgroundColor: AppColors.background,
+        appBarTheme: const AppBarTheme(
+          elevation: 0,
+          backgroundColor: AppColors.background,
+          surfaceTintColor: Colors.transparent,
+          foregroundColor: AppColors.textPrimary,
+          titleTextStyle: AppTextStyles.title,
+        ),
+        textTheme: const TextTheme(
+          headlineLarge: AppTextStyles.headline,
+          headlineMedium: AppTextStyles.title,
+          bodyLarge: AppTextStyles.body,
+          bodyMedium: AppTextStyles.body,
+          labelLarge: AppTextStyles.label,
+        ),
+        cardTheme: CardThemeData(
+          elevation: 0,
+          color: AppColors.surface,
+          surfaceTintColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+            side: const BorderSide(color: AppColors.border),
+          ),
+        ),
+        snackBarTheme: const SnackBarThemeData(
+          behavior: SnackBarBehavior.floating,
+          shape: StadiumBorder(),
+          backgroundColor: AppColors.surface,
+          contentTextStyle: TextStyle(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          selectedItemColor: AppColors.gold,
+          unselectedItemColor: AppColors.textSecondary,
+          backgroundColor: AppColors.background,
+          elevation: 0,
+          type: BottomNavigationBarType.fixed,
+        ),
+      );
+    } catch (error, stackTrace) {
+      debugPrint('Theme fallback due to error: $error\n$stackTrace');
+      return ThemeData.light(useMaterial3: true);
+    }
+  }
+
+  /// 🌙 Modern Dark Theme
+  static ThemeData get dark {
     return ThemeData(
       brightness: Brightness.dark,
       primaryColor: AppColors.primaryButton,
       scaffoldBackgroundColor: AppColors.background,
 
-      // AppBar teması
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.cardBackground,
         elevation: 0,
@@ -22,14 +89,12 @@ class AppTheme {
         ),
       ),
 
-      // Kart teması
       cardTheme: CardThemeData(
         color: AppColors.cardBackground,
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
 
-      // Elevated Button teması
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryButton,
@@ -42,7 +107,6 @@ class AppTheme {
         ),
       ),
 
-      // Text Button teması
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primaryButton,
@@ -50,15 +114,10 @@ class AppTheme {
         ),
       ),
 
-      // Input decoration teması
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.cardBackground,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
@@ -79,10 +138,8 @@ class AppTheme {
         ),
       ),
 
-      // Icon teması
       iconTheme: const IconThemeData(color: AppColors.primaryText, size: 24),
 
-      // Text teması
       textTheme: const TextTheme(
         displayLarge: TextStyle(color: AppColors.primaryText),
         displayMedium: TextStyle(color: AppColors.primaryText),

@@ -1,16 +1,12 @@
-# frontend
+# Nexora Math - Frontend
 
-A new Flutter project.
+Flutter-based mobile client for the Nexora Math experience. The current focus is a static, localized Home screen that follows the shared design system.
 
-## Getting Started
+## Çalıştırma
+- Bağımlılıkları kur: `flutter pub get`
+- Lokalizasyon dosyalarını üret (gerekirse): `flutter gen-l10n`
+- Uygulamayı çalıştır: `flutter run -d <cihaz_id>`
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Nasıl test ederim?
+- Widget testlerini çalıştır: `flutter test`
+- Home ekranını hızlıca görmek için: `flutter run` komutuyla emülatörde aç; butonlar bilinçli olarak pasif, sadece bilgilendirici SnackBar gösterir.
