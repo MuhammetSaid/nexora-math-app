@@ -1,0 +1,13 @@
+{
+  "@@locale": "en",
+  "appTitle": "Numera",
+  "homeTitle": "NEXORA",
+  "startGame": "Start Game",
+  "chapters": "Chapters",
+  "endlessMode": "Endless Mode",
+  "comingSoon": "Coming soon",
+  "bottomIq": "IQ",
+  "bottomLeaderboard": "Leaderboard",
+  "bottomSettings": "Settings",
+  "bottomSession": "Session"
+}
