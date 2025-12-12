@@ -5,6 +5,7 @@ import '../../theme/colors.dart';
 import '../../theme/text_styles.dart';
 import '../../utils/constants.dart';
 import '../../widgets/common/glow_button.dart';
+import '../game/game_mode_screen.dart';
 
 /// Single home screen matching the provided dark gold reference.
 class HomeScreen extends StatelessWidget {
@@ -19,8 +20,10 @@ class HomeScreen extends StatelessWidget {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
-            final double minHeight = (constraints.maxHeight - MediaQuery.of(context).padding.vertical)
-                .clamp(0, double.infinity);
+            final double minHeight =
+                (constraints.maxHeight -
+                        MediaQuery.of(context).padding.vertical)
+                    .clamp(0, double.infinity);
             return Center(
               child: SingleChildScrollView(
                 padding: AppSpacing.page(),
@@ -44,8 +47,16 @@ class HomeScreen extends StatelessWidget {
                                 color: AppColors.gold,
                                 letterSpacing: 1.4,
                                 shadows: const <Shadow>[
-                                  Shadow(color: AppColors.shadow, blurRadius: 4, offset: Offset(0, 2)),
-                                  Shadow(color: AppColors.gold, blurRadius: 8, offset: Offset(0, 0)),
+                                  Shadow(
+                                    color: AppColors.shadow,
+                                    blurRadius: 4,
+                                    offset: Offset(0, 2),
+                                  ),
+                                  Shadow(
+                                    color: AppColors.gold,
+                                    blurRadius: 8,
+                                    offset: Offset(0, 0),
+                                  ),
                                 ],
                               ),
                             ),
@@ -55,7 +66,15 @@ class HomeScreen extends StatelessWidget {
                             GlowButton(
                               label: l10n.startGame,
                               height: 68,
-                              onTap: () => _showComingSoon(context),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const GameModeScreen(),
+                                  ),
+                                );
+                              },
                             ),
                             const SizedBox(height: AppSpacing.xxl + 8),
                             Row(
@@ -127,7 +146,9 @@ class HomeScreen extends StatelessWidget {
 
   void _showComingSoon(BuildContext context) {
     try {
-      final ScaffoldMessengerState? messenger = ScaffoldMessenger.maybeOf(context);
+      final ScaffoldMessengerState? messenger = ScaffoldMessenger.maybeOf(
+        context,
+      );
       messenger?.hideCurrentSnackBar();
       messenger?.showSnackBar(
         SnackBar(
@@ -148,9 +169,7 @@ class _OrbitalBadge extends StatelessWidget {
     return Container(
       width: 220,
       height: 220,
-      decoration: const BoxDecoration(
-        color: AppColors.background,
-      ),
+      decoration: const BoxDecoration(color: AppColors.background),
       child: Center(
         child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
@@ -159,10 +178,15 @@ class _OrbitalBadge extends StatelessWidget {
             width: 250,
             height: 250,
             fit: BoxFit.contain,
-            errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-              debugPrint('Orbital asset missing: $error');
-              return Icon(Icons.language, color: AppColors.goldSoft, size: 88);
-            },
+            errorBuilder:
+                (BuildContext context, Object error, StackTrace? stackTrace) {
+                  debugPrint('Orbital asset missing: $error');
+                  return Icon(
+                    Icons.language,
+                    color: AppColors.goldSoft,
+                    size: 88,
+                  );
+                },
           ),
         ),
       ),
@@ -204,10 +228,7 @@ class _BottomMetaRow extends StatelessWidget {
 
 /// Immutable metadata container used to render footer items.
 class _BottomMeta {
-  const _BottomMeta({
-    required this.icon,
-    required this.label,
-  });
+  const _BottomMeta({required this.icon, required this.label});
 
   final IconData icon;
   final String label;
