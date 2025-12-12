@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import '../levels/levels_screen.dart';
 
 class GameModeScreen extends StatelessWidget {
   const GameModeScreen({super.key});
@@ -38,6 +39,14 @@ class GameModeScreen extends StatelessWidget {
                           const Color(0xFF6B4CE6).withOpacity(0.3),
                           const Color(0xFF9B6CE6).withOpacity(0.2),
                         ],
+                        onTap: (context) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const LevelsScreen(),
+                            ),
+                          );
+                        },
                       ),
                       _buildGameModeCard(
                         icon: Icons.calendar_month_rounded,
@@ -74,12 +83,8 @@ class GameModeScreen extends StatelessWidget {
 
                 // Seviye Progress Kartı
                 SizedBox(height: 265, child: _buildLevelProgressCard()),
-                _deneme(
-                  pad: 14,
-                ),
-                _deneme(
-                  pad: 22,
-                ),
+                _deneme(pad: 14),
+                _deneme(pad: 22),
 
                 const SizedBox(height: 15),
 
@@ -240,50 +245,56 @@ class GameModeScreen extends StatelessWidget {
     bool showProgress = false,
     double progressValue = 0.0,
     required List<Color> gradientColors,
+    Function(BuildContext)? onTap,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
-        color: const Color.fromARGB(255, 229, 229, 229).withOpacity(0.2),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(15),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, color: Colors.white, size: 36),
-                const Spacer(),
-                Text(
-                  title + ' ' + subtitle!,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1,
-                  ),
-                ),
-
-                if (showProgress) ...[
-                  const SizedBox(height: 12),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: LinearProgressIndicator(
-                      value: progressValue,
-                      backgroundColor: Colors.white.withOpacity(0.2),
-                      valueColor: const AlwaysStoppedAnimation<Color>(
-                        Color(0xFFFF9F43),
+    return Builder(
+      builder: (context) => GestureDetector(
+        onTap: onTap != null ? () => onTap(context) : null,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
+            color: const Color.fromARGB(255, 229, 229, 229).withOpacity(0.2),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(icon, color: Colors.white, size: 36),
+                    const Spacer(),
+                    Text(
+                      title + ' ' + subtitle!,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
                       ),
-                      minHeight: 6,
                     ),
-                  ),
-                ],
-              ],
+
+                    if (showProgress) ...[
+                      const SizedBox(height: 12),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: LinearProgressIndicator(
+                          value: progressValue,
+                          backgroundColor: Colors.white.withOpacity(0.2),
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            Color(0xFFFF9F43),
+                          ),
+                          minHeight: 6,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
             ),
           ),
         ),
