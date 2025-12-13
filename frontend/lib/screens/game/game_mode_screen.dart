@@ -39,8 +39,8 @@ class GameModeScreen extends StatelessWidget {
                     children: [
                       _buildGameModeCard(
                         icon: Icons.layers_rounded,
-                        title: 'SEVİYELİ',
-                        subtitle: 'OYNA',
+                        title: l10n.levelMode,
+                        subtitle: l10n.play,
                         showProgress: true,
                         progressValue: 0.6,
                         gradientColors: [
@@ -58,8 +58,8 @@ class GameModeScreen extends StatelessWidget {
                       ),
                       _buildGameModeCard(
                         icon: Icons.calendar_month_rounded,
-                        title: 'GÜNLÜK',
-                        subtitle: 'QUIZ',
+                        title: l10n.dailyPuzzle,
+                        subtitle: l10n.quiz,
                         gradientColors: [
                           const Color(0xFF6B4CE6).withOpacity(0.3),
                           const Color(0xFF9B6CE6).withOpacity(0.2),
@@ -67,8 +67,8 @@ class GameModeScreen extends StatelessWidget {
                       ),
                       _buildGameModeCard(
                         icon: Icons.smart_toy_rounded,
-                        title: 'ROBOTA KARŞI',
-                        subtitle: 'OYNA',
+                        title: l10n.botPlay,
+                        subtitle: l10n.play,
                         gradientColors: [
                           const Color(0xFF6B4CE6).withOpacity(0.3),
                           const Color(0xFF9B6CE6).withOpacity(0.2),
