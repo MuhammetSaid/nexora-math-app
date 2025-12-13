@@ -37,4 +37,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bottomSession => 'Session';
+
+  @override
+  String levelTitle(int level) {
+    return 'Level $level';
+  }
+
+  @override
+  String get answerLabel => 'Answer';
+
+  @override
+  String get enter => 'Enter';
+
+  @override
+  String get hint => 'Hint';
 }

@@ -9,5 +9,16 @@
   "bottomIq": "IQ",
   "bottomLeaderboard": "Leaderboard",
   "bottomSettings": "Settings",
-  "bottomSession": "Session"
+  "bottomSession": "Session",
+  "levelTitle": "Level {level}",
+  "@levelTitle": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "answerLabel": "Answer",
+  "enter": "Enter",
+  "hint": "Hint"
 }

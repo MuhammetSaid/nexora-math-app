@@ -157,6 +157,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Session'**
   String get bottomSession;
+
+  /// No description provided for @levelTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Level {level}'**
+  String levelTitle(int level);
+
+  /// No description provided for @answerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Answer'**
+  String get answerLabel;
+
+  /// No description provided for @enter.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter'**
+  String get enter;
+
+  /// No description provided for @hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Hint'**
+  String get hint;
 }
 
 class _AppLocalizationsDelegate

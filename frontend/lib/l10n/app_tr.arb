@@ -9,5 +9,16 @@
   "bottomIq": "IQ",
   "bottomLeaderboard": "Liderlik",
   "bottomSettings": "Ayarlar",
-  "bottomSession": "Oturum"
+  "bottomSession": "Oturum",
+  "levelTitle": "Seviye {level}",
+  "@levelTitle": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "answerLabel": "Cevap",
+  "enter": "Enter",
+  "hint": "İpucu"
 }

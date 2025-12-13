@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'colors.dart';
 
-/// Uygulama genel tipografi stilleri (Landing + Game + UI)
+/// Shared typography tokens for the app.
 class AppTextStyles {
   const AppTextStyles._();
 
-  // ==== Landing Tarafındaki Stil Seti ====
+  // ==== Landing and shared ====
   static const TextStyle headline = TextStyle(
     fontSize: 30,
     fontWeight: FontWeight.w700,
@@ -47,7 +47,7 @@ class AppTextStyles {
     color: AppColors.gold,
   );
 
-  // ==== Development Branch Stil Seti (Game/UI) ====
+  // ==== Game specific ====
   static const TextStyle heading1 = TextStyle(
     fontSize: 32,
     fontWeight: FontWeight.bold,
@@ -96,7 +96,44 @@ class AppTextStyles {
     color: AppColors.primaryText,
   );
 
-  // ==== Güvenli Merge Metodu ====
+  // ==== Puzzle screen tokens ====
+  static const TextStyle levelTitle = TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.w700,
+    letterSpacing: 0.6,
+    color: AppColors.textPrimary,
+  );
+
+  static const TextStyle puzzleText = TextStyle(
+    fontSize: 22,
+    fontWeight: FontWeight.w500,
+    height: 1.5,
+    letterSpacing: 0.9,
+    color: AppColors.mutedText,
+  );
+
+  static const TextStyle answerInput = TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+    letterSpacing: 0.3,
+    color: AppColors.mutedText,
+  );
+
+  static const TextStyle buttonLabel = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.w700,
+    letterSpacing: 0.3,
+    color: AppColors.primaryText,
+  );
+
+  static const TextStyle keypadNumber = TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+    letterSpacing: 0.45,
+    color: AppColors.mutedText,
+  );
+
+  // ==== Safe merge helper ====
   static TextStyle safeMerge(TextStyle base, TextStyle? other) {
     try {
       return base.merge(other);

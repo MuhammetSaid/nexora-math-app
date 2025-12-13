@@ -37,4 +37,18 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get bottomSession => 'Oturum';
+
+  @override
+  String levelTitle(int level) {
+    return 'Seviye $level';
+  }
+
+  @override
+  String get answerLabel => 'Cevap';
+
+  @override
+  String get enter => 'Enter';
+
+  @override
+  String get hint => 'İpucu';
 }

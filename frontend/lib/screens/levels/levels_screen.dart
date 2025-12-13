@@ -1,5 +1,8 @@
-import 'package:flutter/material.dart';
 import 'dart:ui';
+
+import 'package:flutter/material.dart';
+
+import '../game/question_screen.dart';
 
 class LevelsScreen extends StatelessWidget {
   const LevelsScreen({super.key});
@@ -244,6 +247,7 @@ class LevelsScreen extends StatelessWidget {
           bool isLocked = levelNumber > 15;
 
           return _buildLevelCard(
+            context: context,
             levelNumber: levelNumber,
             isCompleted: isCompleted,
             isCurrent: isCurrent,
@@ -255,6 +259,7 @@ class LevelsScreen extends StatelessWidget {
   }
 
   Widget _buildLevelCard({
+    required BuildContext context,
     required int levelNumber,
     required bool isCompleted,
     required bool isCurrent,
@@ -290,8 +295,12 @@ class LevelsScreen extends StatelessWidget {
       onTap: isLocked
           ? null
           : () {
-              // Level tıklama işlemi
-              print('Level $levelNumber tıklandı');
+              Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (_) => LevelPuzzleScreen(level: levelNumber),
+                ),
+              );
             },
       child: Container(
         decoration: BoxDecoration(
@@ -313,52 +322,56 @@ class LevelsScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, color: textColor, size: 28),
-                const SizedBox(height: 6),
-                Text(
-                  '$levelNumber',
-                  style: TextStyle(
-                    color: isLocked ? Colors.grey.shade600 : Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(icon, color: textColor, size: 28),
+                  const SizedBox(height: 6),
+                  Text(
+                    '$levelNumber',
+                    style: TextStyle(
+                      color: isLocked ? Colors.grey.shade600 : Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
                   ),
-                ),
-                if (isCompleted)
-                  Container(
-                    margin: const EdgeInsets.only(top: 4),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: const Color(0xFF4CAF50).withOpacity(0.2),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.star,
-                          color: const Color(0xFFFFD700),
-                          size: 12,
-                        ),
-                        const SizedBox(width: 2),
-                        Text(
-                          '3',
-                          style: TextStyle(
+                  if (isCompleted)
+                    Container(
+                      margin: const EdgeInsets.only(top: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: const Color(0xFF4CAF50).withOpacity(0.2),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.star,
                             color: const Color(0xFFFFD700),
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
+                            size: 12,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 2),
+                          Text(
+                            '3',
+                            style: TextStyle(
+                              color: const Color(0xFFFFD700),
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
