@@ -181,6 +181,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hint'**
   String get hint;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// No description provided for @profileSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Settings'**
+  String get profileSettings;
+
+  /// No description provided for @achievements.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievements'**
+  String get achievements;
+
+  /// No description provided for @language.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// No description provided for @soundsOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sounds On'**
+  String get soundsOn;
+
+  /// No description provided for @soundsOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Sounds Off'**
+  String get soundsOff;
+
+  /// No description provided for @deleteData.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Data'**
+  String get deleteData;
+
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicy;
+
+  /// No description provided for @termsOfService.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Service'**
+  String get termsOfService;
+
+  /// No description provided for @dialogPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Content coming soon.'**
+  String get dialogPlaceholder;
+
+  /// No description provided for @dailyPuzzle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Puzzle'**
+  String get dailyPuzzle;
+
+  /// No description provided for @levelMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Levels'**
+  String get levelMode;
+
+  /// No description provided for @play.
+  ///
+  /// In en, this message translates to:
+  /// **'Play'**
+  String get play;
+
+  /// No description provided for @quiz.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiz'**
+  String get quiz;
+
+  /// No description provided for @botPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Play vs Bot'**
+  String get botPlay;
+
+  /// No description provided for @tournament.
+  ///
+  /// In en, this message translates to:
+  /// **'Tournament'**
+  String get tournament;
+
+  /// No description provided for @levelsPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Play Levels'**
+  String get levelsPlay;
+
+  /// No description provided for @totalLevels.
+  ///
+  /// In en, this message translates to:
+  /// **'100 Levels'**
+  String get totalLevels;
 }
 
 class _AppLocalizationsDelegate

@@ -11,6 +11,7 @@ import '../../widgets/game/level_app_bar.dart';
 import '../../widgets/game/nexora_background.dart';
 import '../../widgets/game/numeric_keypad.dart';
 import '../../widgets/game/puzzle_card.dart';
+import '../settings/settings_screen.dart';
 
 class LevelPuzzleScreen extends StatefulWidget {
   const LevelPuzzleScreen({super.key, required this.level});
@@ -99,7 +100,16 @@ class _LevelPuzzleScreenState extends State<LevelPuzzleScreen> {
                   onKeyTap: _answer.append,
                 ),
                 const SizedBox(height: AppSpacing.md),
-                const _FooterMetaBar(),
+                _FooterMetaBar(
+                  onSettingsTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) => const SettingsScreen(),
+                      ),
+                    );
+                  },
+                ),
               ],
             ),
           ),
@@ -296,7 +306,9 @@ class _PremiumButton extends StatelessWidget {
 }
 
 class _FooterMetaBar extends StatelessWidget {
-  const _FooterMetaBar();
+  const _FooterMetaBar({this.onSettingsTap});
+
+  final VoidCallback? onSettingsTap;
 
   @override
   Widget build(BuildContext context) {
@@ -309,10 +321,14 @@ class _FooterMetaBar extends StatelessWidget {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: const <Widget>[
-          _FooterMeta(icon: Icons.emoji_events_outlined, label: 'Trophy'),
-          _FooterMeta(icon: Icons.person_outline, label: 'Profile'),
-          _FooterMeta(icon: Icons.settings_outlined, label: 'Settings'),
+        children: <Widget>[
+          const _FooterMeta(icon: Icons.emoji_events_outlined, label: 'Trophy'),
+          const _FooterMeta(icon: Icons.person_outline, label: 'Profile'),
+          _FooterMeta(
+            icon: Icons.settings_outlined,
+            label: 'Settings',
+            onTap: onSettingsTap,
+          ),
         ],
       ),
     );
@@ -320,14 +336,15 @@ class _FooterMetaBar extends StatelessWidget {
 }
 
 class _FooterMeta extends StatelessWidget {
-  const _FooterMeta({required this.icon, required this.label});
+  const _FooterMeta({required this.icon, required this.label, this.onTap});
 
   final IconData icon;
   final String label;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    final Widget content = Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Icon(icon, color: AppColors.goldAccent, size: 22),
@@ -342,6 +359,8 @@ class _FooterMeta extends StatelessWidget {
         ),
       ],
     );
+    if (onTap == null) return content;
+    return GestureDetector(onTap: onTap, child: content);
   }
 }
 

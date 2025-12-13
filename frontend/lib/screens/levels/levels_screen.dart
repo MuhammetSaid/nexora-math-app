@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../game/question_screen.dart';
 
 class LevelsScreen extends StatelessWidget {
@@ -9,6 +10,7 @@ class LevelsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(color: Color(0xFF1e1e1e)),
@@ -16,11 +18,11 @@ class LevelsScreen extends StatelessWidget {
           child: Column(
             children: [
               // Header
-              _buildHeader(context),
+              _buildHeader(context, l10n),
               const SizedBox(height: 20),
 
               // Progress Info
-              _buildProgressInfo(),
+              _buildProgressInfo(l10n),
               const SizedBox(height: 25),
 
               // Levels Grid
@@ -32,7 +34,7 @@ class LevelsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Row(
@@ -88,7 +90,7 @@ class LevelsScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '100 Seviye',
+                  l10n.totalLevels,
                   style: TextStyle(
                     color: Colors.grey.shade400,
                     fontSize: 14,
@@ -135,7 +137,7 @@ class LevelsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProgressInfo() {
+  Widget _buildProgressInfo(AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Container(

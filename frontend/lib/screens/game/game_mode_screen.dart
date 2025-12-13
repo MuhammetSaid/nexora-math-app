@@ -4,12 +4,16 @@ import 'package:flutter/material.dart';
 
 import '../levels/levels_screen.dart';
 import 'question_screen.dart';
+import 'daily_puzzle_screen.dart';
+import '../settings/settings_screen.dart';
+import '../../l10n/app_localizations.dart';
 
 class GameModeScreen extends StatelessWidget {
   const GameModeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
     const int currentLevel = 15;
     return Scaffold(
       body: Container(
@@ -72,8 +76,8 @@ class GameModeScreen extends StatelessWidget {
                       ),
                       _buildGameModeCard(
                         icon: Icons.emoji_events_rounded,
-                        title: 'TURNUVAYA',
-                        subtitle: 'KATIL',
+                        title: l10n.tournament,
+                        subtitle: l10n.play,
                         gradientColors: [
                           const Color(0xFF6B4CE6).withOpacity(0.3),
                           const Color(0xFF9B6CE6).withOpacity(0.2),
@@ -96,7 +100,7 @@ class GameModeScreen extends StatelessWidget {
                 const SizedBox(height: 15),
 
                 // Alt Navigasyon
-                _buildBottomNavigation(),
+                _buildBottomNavigation(context),
               ],
             ),
           ),
@@ -533,7 +537,7 @@ class GameModeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomNavigation() {
+  Widget _buildBottomNavigation(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
@@ -557,7 +561,18 @@ class GameModeScreen extends StatelessWidget {
             children: [
               _buildNavItem(Icons.emoji_events, 'Trophy'),
               _buildNavItem(Icons.person_outline, 'Profile'),
-              _buildNavItem(Icons.settings_outlined, 'Settings'),
+              _buildNavItem(
+                Icons.settings_outlined,
+                'Settings',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) => const SettingsScreen(),
+                    ),
+                  );
+                },
+              ),
             ],
           ),
         ),
@@ -565,11 +580,14 @@ class GameModeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label) {
+  Widget _buildNavItem(IconData icon, String label, {VoidCallback? onTap}) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: Colors.white.withOpacity(0.8), size: 28),
+        GestureDetector(
+          onTap: onTap,
+          child: Icon(icon, color: Colors.white.withOpacity(0.8), size: 28),
+        ),
         const SizedBox(height: 4),
         Text(
           label,

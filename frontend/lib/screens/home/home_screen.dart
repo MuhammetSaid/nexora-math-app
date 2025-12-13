@@ -5,6 +5,7 @@ import '../../theme/colors.dart';
 import '../../theme/text_styles.dart';
 import '../../utils/constants.dart';
 import '../../widgets/common/glow_button.dart';
+import '../settings/settings_screen.dart';
 import '../game/game_mode_screen.dart';
 
 /// Single home screen matching the provided dark gold reference.
@@ -103,7 +104,7 @@ class HomeScreen extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
                             _BottomMetaRow(
-                              items: const <_BottomMeta>[
+                              items: <_BottomMeta>[
                                 _BottomMeta(
                                   icon: Icons.psychology_outlined,
                                   label: 'IQ',
@@ -115,6 +116,14 @@ class HomeScreen extends StatelessWidget {
                                 _BottomMeta(
                                   icon: Icons.settings_outlined,
                                   label: 'Settings',
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const SettingsScreen(),
+                                      ),
+                                    );
+                                  },
                                 ),
                                 _BottomMeta(
                                   icon: Icons.account_circle_outlined,
@@ -207,17 +216,20 @@ class _BottomMetaRow extends StatelessWidget {
       children: items
           .map(
             (_BottomMeta meta) => Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Icon(meta.icon, color: AppColors.goldSoft, size: 28),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    meta.label,
-                    style: AppTextStyles.navLabel,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+              child: GestureDetector(
+                onTap: meta.onTap,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Icon(meta.icon, color: AppColors.goldSoft, size: 28),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      meta.label,
+                      style: AppTextStyles.navLabel,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
             ),
           )
@@ -228,8 +240,9 @@ class _BottomMetaRow extends StatelessWidget {
 
 /// Immutable metadata container used to render footer items.
 class _BottomMeta {
-  const _BottomMeta({required this.icon, required this.label});
+  const _BottomMeta({required this.icon, required this.label, this.onTap});
 
   final IconData icon;
   final String label;
+  final VoidCallback? onTap;
 }

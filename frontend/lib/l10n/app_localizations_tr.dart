@@ -51,4 +51,58 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get hint => 'İpucu';
+
+  @override
+  String get settings => 'Ayarlar';
+
+  @override
+  String get profileSettings => 'Profil Ayarları';
+
+  @override
+  String get achievements => 'Başarılar';
+
+  @override
+  String get language => 'Dil';
+
+  @override
+  String get soundsOn => 'Ses Açık';
+
+  @override
+  String get soundsOff => 'Ses Kapalı';
+
+  @override
+  String get deleteData => 'Verileri Sil';
+
+  @override
+  String get privacyPolicy => 'Gizlilik Politikası';
+
+  @override
+  String get termsOfService => 'Kullanım Şartları';
+
+  @override
+  String get dialogPlaceholder => 'İçerik yakında.';
+
+  @override
+  String get dailyPuzzle => 'Günlük Soru';
+
+  @override
+  String get levelMode => 'Seviyeler';
+
+  @override
+  String get play => 'Oyna';
+
+  @override
+  String get quiz => 'Quiz';
+
+  @override
+  String get botPlay => 'Botla Oyna';
+
+  @override
+  String get tournament => 'Turnuva';
+
+  @override
+  String get levelsPlay => 'Seviyeli Oyna';
+
+  @override
+  String get totalLevels => '100 Seviye';
 }
