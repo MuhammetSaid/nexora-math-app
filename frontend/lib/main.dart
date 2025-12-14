@@ -24,8 +24,24 @@ Future<void> _bootstrap() async {
   );
 }
 
-class NexoraApp extends StatelessWidget {
+class NexoraApp extends StatefulWidget {
   const NexoraApp({super.key});
+
+  static _NexoraAppState? of(BuildContext context) =>
+      context.findAncestorStateOfType<_NexoraAppState>();
+
+  @override
+  State<NexoraApp> createState() => _NexoraAppState();
+}
+
+class _NexoraAppState extends State<NexoraApp> {
+  Locale? _locale;
+
+  void setLocale(Locale locale) {
+    setState(() {
+      _locale = locale;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +50,7 @@ class NexoraApp extends StatelessWidget {
       title: 'Nexora Math',
       theme: AppTheme.light(),
       supportedLocales: AppLocalizations.supportedLocales,
+      locale: _locale,
       localizationsDelegates: <LocalizationsDelegate<dynamic>>[
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -44,6 +61,7 @@ class NexoraApp extends StatelessWidget {
           AppLocalizations.of(context).appTitle,
       localeResolutionCallback: (Locale? locale, Iterable<Locale> supported) {
         try {
+          if (_locale != null) return _locale;
           if (locale == null) {
             return supported.first;
           }

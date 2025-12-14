@@ -1,12 +1,20 @@
-import 'package:flutter/material.dart';
 import 'dart:ui';
+
+import 'package:flutter/material.dart';
+
 import '../levels/levels_screen.dart';
+import 'question_screen.dart';
+import 'daily_puzzle_screen.dart';
+import '../settings/settings_screen.dart';
+import '../../l10n/app_localizations.dart';
 
 class GameModeScreen extends StatelessWidget {
   const GameModeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    const int currentLevel = 15;
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(color: Color(0xFF1e1e1e)),
@@ -31,8 +39,8 @@ class GameModeScreen extends StatelessWidget {
                     children: [
                       _buildGameModeCard(
                         icon: Icons.layers_rounded,
-                        title: 'SEVİYELİ',
-                        subtitle: 'OYNA',
+                        title: l10n.levelMode,
+                        subtitle: l10n.play,
                         showProgress: true,
                         progressValue: 0.6,
                         gradientColors: [
@@ -50,8 +58,8 @@ class GameModeScreen extends StatelessWidget {
                       ),
                       _buildGameModeCard(
                         icon: Icons.calendar_month_rounded,
-                        title: 'GÜNLÜK',
-                        subtitle: 'QUIZ',
+                        title: l10n.dailyPuzzle,
+                        subtitle: l10n.quiz,
                         gradientColors: [
                           const Color(0xFF6B4CE6).withOpacity(0.3),
                           const Color(0xFF9B6CE6).withOpacity(0.2),
@@ -59,8 +67,8 @@ class GameModeScreen extends StatelessWidget {
                       ),
                       _buildGameModeCard(
                         icon: Icons.smart_toy_rounded,
-                        title: 'ROBOTA KARŞI',
-                        subtitle: 'OYNA',
+                        title: l10n.botPlay,
+                        subtitle: l10n.play,
                         gradientColors: [
                           const Color(0xFF6B4CE6).withOpacity(0.3),
                           const Color(0xFF9B6CE6).withOpacity(0.2),
@@ -68,8 +76,8 @@ class GameModeScreen extends StatelessWidget {
                       ),
                       _buildGameModeCard(
                         icon: Icons.emoji_events_rounded,
-                        title: 'TURNUVAYA',
-                        subtitle: 'KATIL',
+                        title: l10n.tournament,
+                        subtitle: l10n.play,
                         gradientColors: [
                           const Color(0xFF6B4CE6).withOpacity(0.3),
                           const Color(0xFF9B6CE6).withOpacity(0.2),
@@ -82,14 +90,17 @@ class GameModeScreen extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 // Seviye Progress Kartı
-                SizedBox(height: 265, child: _buildLevelProgressCard()),
+                SizedBox(
+                  height: 265,
+                  child: _buildLevelProgressCard(context, currentLevel),
+                ),
                 _deneme(pad: 14),
                 _deneme(pad: 22),
 
                 const SizedBox(height: 15),
 
                 // Alt Navigasyon
-                _buildBottomNavigation(),
+                _buildBottomNavigation(context),
               ],
             ),
           ),
@@ -302,7 +313,7 @@ class GameModeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLevelProgressCard() {
+  Widget _buildLevelProgressCard(BuildContext context, int currentLevel) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(17),
@@ -341,7 +352,7 @@ class GameModeScreen extends StatelessWidget {
                 const SizedBox(width: 16),
 
                 // Sağ taraf - Play Orb
-                Expanded(flex: 2, child: _buildPlayOrb()),
+                Expanded(flex: 2, child: _buildPlayOrb(context, currentLevel)),
               ],
             ),
           ),
@@ -456,58 +467,68 @@ class GameModeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPlayOrb() {
+  Widget _buildPlayOrb(BuildContext context, int currentLevel) {
     return Center(
-      child: Container(
-        width: 110,
-        height: 110,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: RadialGradient(
-            center: Alignment.topLeft,
-            radius: 1.2,
-            colors: [
-              Colors.white.withOpacity(0.4),
-              Colors.white.withOpacity(0.2),
-              Colors.white.withOpacity(0.1),
-              Colors.transparent,
-            ],
-            stops: const [0.0, 0.3, 0.6, 1.0],
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.white.withOpacity(0.3),
-              blurRadius: 30,
-              spreadRadius: 6,
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute<void>(
+              builder: (_) => LevelPuzzleScreen(level: currentLevel),
             ),
-            BoxShadow(
-              color: Colors.white.withOpacity(0.2),
-              blurRadius: 45,
-              spreadRadius: 10,
+          );
+        },
+        child: Container(
+          width: 110,
+          height: 110,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: RadialGradient(
+              center: Alignment.topLeft,
+              radius: 1.2,
+              colors: [
+                Colors.white.withOpacity(0.4),
+                Colors.white.withOpacity(0.2),
+                Colors.white.withOpacity(0.1),
+                Colors.transparent,
+              ],
+              stops: const [0.0, 0.3, 0.6, 1.0],
             ),
-          ],
-        ),
-        child: ClipOval(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-            child: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.4),
-                  width: 2,
-                ),
-                color: const Color(0xFFFFFFFF).withOpacity(0.70),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.white.withOpacity(0.3),
+                blurRadius: 30,
+                spreadRadius: 6,
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.play_arrow_rounded,
-                    color: const Color(0xFF1E1E1E).withOpacity(0.75),
-                    size: 63,
+              BoxShadow(
+                color: Colors.white.withOpacity(0.2),
+                blurRadius: 45,
+                spreadRadius: 10,
+              ),
+            ],
+          ),
+          child: ClipOval(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.4),
+                    width: 2,
                   ),
-                ],
+                  color: const Color(0xFFFFFFFF).withOpacity(0.70),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.play_arrow_rounded,
+                      color: const Color(0xFF1E1E1E).withOpacity(0.75),
+                      size: 63,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -516,7 +537,7 @@ class GameModeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomNavigation() {
+  Widget _buildBottomNavigation(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
@@ -540,7 +561,18 @@ class GameModeScreen extends StatelessWidget {
             children: [
               _buildNavItem(Icons.emoji_events, 'Trophy'),
               _buildNavItem(Icons.person_outline, 'Profile'),
-              _buildNavItem(Icons.settings_outlined, 'Settings'),
+              _buildNavItem(
+                Icons.settings_outlined,
+                'Settings',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) => const SettingsScreen(),
+                    ),
+                  );
+                },
+              ),
             ],
           ),
         ),
@@ -548,11 +580,14 @@ class GameModeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label) {
+  Widget _buildNavItem(IconData icon, String label, {VoidCallback? onTap}) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: Colors.white.withOpacity(0.8), size: 28),
+        GestureDetector(
+          onTap: onTap,
+          child: Icon(icon, color: Colors.white.withOpacity(0.8), size: 28),
+        ),
         const SizedBox(height: 4),
         Text(
           label,
