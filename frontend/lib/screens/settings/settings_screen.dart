@@ -53,13 +53,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: Image.asset(
                       'assets/images/orbital.png',
                       fit: BoxFit.contain,
-                      errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-                        return Icon(
-                          Icons.language_outlined,
-                          color: AppColors.goldAccent,
-                          size: 72,
-                        );
-                      },
+                      cacheWidth: 180,
+                      cacheHeight: 180,
+                      errorBuilder:
+                          (
+                            BuildContext context,
+                            Object error,
+                            StackTrace? stackTrace,
+                          ) {
+                            return const Icon(
+                              Icons.language_outlined,
+                              color: AppColors.goldAccent,
+                              size: 72,
+                            );
+                          },
                     ),
                   ),
                 ),
@@ -161,7 +168,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: <Widget>[
               Text(
                 AppLocalizations.of(context).language,
-                style: AppTextStyles.heading3.copyWith(color: AppColors.textPrimary),
+                style: AppTextStyles.heading3.copyWith(
+                  color: AppColors.textPrimary,
+                ),
               ),
               const SizedBox(height: AppSpacing.md),
               _LanguageTile(
