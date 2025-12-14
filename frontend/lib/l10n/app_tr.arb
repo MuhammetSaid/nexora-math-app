@@ -1,0 +1,42 @@
+{
+  "@@locale": "tr",
+  "appTitle": "Numera",
+  "homeTitle": "NEXORA",
+  "startGame": "Oyuna Başla",
+  "chapters": "Bölümler",
+  "endlessMode": "Sonsuz Mod",
+  "comingSoon": "Yakında",
+  "bottomIq": "IQ",
+  "bottomLeaderboard": "Liderlik",
+  "bottomSettings": "Ayarlar",
+  "bottomSession": "Oturum",
+  "levelTitle": "Seviye {level}",
+  "@levelTitle": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "answerLabel": "Cevap",
+  "enter": "Enter",
+  "hint": "İpucu",
+  "settings": "Ayarlar",
+  "profileSettings": "Profil Ayarları",
+  "achievements": "Başarılar",
+  "language": "Dil",
+  "soundsOn": "Ses Açık",
+  "soundsOff": "Ses Kapalı",
+  "deleteData": "Verileri Sil",
+  "privacyPolicy": "Gizlilik Politikası",
+  "termsOfService": "Kullanım Şartları",
+  "dialogPlaceholder": "İçerik yakında.",
+  "dailyPuzzle": "Günlük Soru",
+  "levelMode": "Seviyeler",
+  "play": "Oyna",
+  "quiz": "Quiz",
+  "botPlay": "Botla Oyna",
+  "tournament": "Turnuva",
+  "levelsPlay": "Seviyeli Oyna",
+  "totalLevels": "100 Seviye"
+}

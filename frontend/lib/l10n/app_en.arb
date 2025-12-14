@@ -1,0 +1,42 @@
+{
+  "@@locale": "en",
+  "appTitle": "Numera",
+  "homeTitle": "NEXORA",
+  "startGame": "Start Game",
+  "chapters": "Chapters",
+  "endlessMode": "Endless Mode",
+  "comingSoon": "Coming soon",
+  "bottomIq": "IQ",
+  "bottomLeaderboard": "Leaderboard",
+  "bottomSettings": "Settings",
+  "bottomSession": "Session",
+  "levelTitle": "Level {level}",
+  "@levelTitle": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "answerLabel": "Answer",
+  "enter": "Enter",
+  "hint": "Hint",
+  "settings": "Settings",
+  "profileSettings": "Profile Settings",
+  "achievements": "Achievements",
+  "language": "Language",
+  "soundsOn": "Sounds On",
+  "soundsOff": "Sounds Off",
+  "deleteData": "Delete Data",
+  "privacyPolicy": "Privacy Policy",
+  "termsOfService": "Terms of Service",
+  "dialogPlaceholder": "Content coming soon.",
+  "dailyPuzzle": "Daily Puzzle",
+  "levelMode": "Levels",
+  "play": "Play",
+  "quiz": "Quiz",
+  "botPlay": "Play vs Bot",
+  "tournament": "Tournament",
+  "levelsPlay": "Play Levels",
+  "totalLevels": "100 Levels"
+}
