@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
@@ -7,7 +5,7 @@ import '../game/question_screen.dart';
 
 class LevelsScreen extends StatelessWidget {
   const LevelsScreen({super.key});
-
+  final int currentLevel = 12;
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
@@ -47,29 +45,17 @@ class LevelsScreen extends StatelessWidget {
               height: 45,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.15),
-                  width: 1.5,
-                ),
-                gradient: LinearGradient(
+                border: Border.all(color: const Color(0x26FFFFFF), width: 1.5),
+                gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white.withOpacity(0.08),
-                    Colors.white.withOpacity(0.03),
-                  ],
+                  colors: [Color(0x14FFFFFF), Color(0x08FFFFFF)],
                 ),
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                  child: Icon(
-                    Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white.withOpacity(0.9),
-                    size: 20,
-                  ),
-                ),
+              child: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: Color(0xE6FFFFFF),
+                size: 20,
               ),
             ),
           ),
@@ -80,7 +66,7 @@ class LevelsScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'SEVİYELİ OYNA',
                   style: TextStyle(
                     color: Colors.white,
@@ -91,8 +77,8 @@ class LevelsScreen extends StatelessWidget {
                 ),
                 Text(
                   l10n.totalLevels,
-                  style: TextStyle(
-                    color: Colors.grey.shade400,
+                  style: const TextStyle(
+                    color: Color(0xFFBDBDBD),
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                   ),
@@ -107,29 +93,17 @@ class LevelsScreen extends StatelessWidget {
             height: 45,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.15),
-                width: 1.5,
-              ),
-              gradient: LinearGradient(
+              border: Border.all(color: const Color(0x26FFFFFF), width: 1.5),
+              gradient: const LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Colors.white.withOpacity(0.08),
-                  Colors.white.withOpacity(0.03),
-                ],
+                colors: [Color(0x14FFFFFF), Color(0x08FFFFFF)],
               ),
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Icon(
-                  Icons.info_outline_rounded,
-                  color: Colors.white.withOpacity(0.9),
-                  size: 22,
-                ),
-              ),
+            child: const Icon(
+              Icons.info_outline_rounded,
+              color: Color(0xE6FFFFFF),
+              size: 22,
             ),
           ),
         ],
@@ -144,87 +118,76 @@ class LevelsScreen extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(17),
-          border: Border.all(color: Colors.white.withOpacity(0.15), width: 1.5),
-          gradient: LinearGradient(
+          border: Border.all(color: const Color(0x26FFFFFF), width: 1.5),
+          gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Colors.white.withOpacity(0.08),
-              Colors.white.withOpacity(0.03),
-            ],
+            colors: [Color(0x14FFFFFF), Color(0x08FFFFFF)],
           ),
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(17),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-            child: Column(
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'İlerleme',
-                          style: TextStyle(
-                            color: Colors.grey.shade400,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '15 / 100',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ],
+                    const Text(
+                      'İlerleme',
+                      style: TextStyle(
+                        color: Color(0xFFBDBDBD),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: const Color(0xFFFF9F43).withOpacity(0.2),
-                        border: Border.all(
-                          color: const Color(0xFFFF9F43).withOpacity(0.3),
-                          width: 1,
-                        ),
-                      ),
-                      child: Text(
-                        '%15',
-                        style: TextStyle(
-                          color: const Color(0xFFFF9F43),
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '$currentLevel / 100',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 15),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: LinearProgressIndicator(
-                    value: 0.15,
-                    backgroundColor: Colors.white.withOpacity(0.1),
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                      Color(0xFFFF9F43),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: const Color(0x33FF9F43),
+                    border: Border.all(
+                      color: const Color(0x4DFF9F43),
+                      width: 1,
                     ),
-                    minHeight: 8,
+                  ),
+                  child: Text(
+                    '%$currentLevel',
+                    style: TextStyle(
+                      color: Color(0xFFFF9F43),
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
             ),
-          ),
+            const SizedBox(height: 15),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: const LinearProgressIndicator(
+                value: 0.15,
+                backgroundColor: Color(0x1AFFFFFF),
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF9F43)),
+                minHeight: 8,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -237,16 +200,16 @@ class LevelsScreen extends StatelessWidget {
         physics: const BouncingScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 5,
-          mainAxisSpacing: 12,
-          crossAxisSpacing: 12,
+          mainAxisSpacing: 9,
+          crossAxisSpacing: 9,
           childAspectRatio: 0.85,
         ),
         itemCount: 100,
         itemBuilder: (context, index) {
           int levelNumber = index + 1;
-          bool isCompleted = levelNumber < 15;
-          bool isCurrent = levelNumber == 15;
-          bool isLocked = levelNumber > 15;
+          bool isCompleted = levelNumber < currentLevel;
+          bool isCurrent = levelNumber == currentLevel;
+          bool isLocked = levelNumber > currentLevel;
 
           return _buildLevelCard(
             context: context,
@@ -267,114 +230,96 @@ class LevelsScreen extends StatelessWidget {
     required bool isCurrent,
     required bool isLocked,
   }) {
-    Color cardColor;
-    Color textColor;
-    IconData icon;
-    List<BoxShadow> shadows = [];
+    final Color cardColor;
+    final Color borderColor;
+    final Color textColor;
+    final IconData icon;
+    final List<BoxShadow> shadows;
 
     if (isCompleted) {
-      cardColor = const Color(0xFF4CAF50).withOpacity(0.2);
+      cardColor = const Color(0x334CAF50);
+      borderColor = const Color(0x4D4CAF50);
       textColor = const Color(0xFF4CAF50);
       icon = Icons.check_circle_rounded;
+      shadows = const [];
     } else if (isCurrent) {
-      cardColor = const Color(0xFFFF9F43).withOpacity(0.25);
+      cardColor = const Color(0x40FF9F43);
+      borderColor = const Color(0x4DFF9F43);
       textColor = const Color(0xFFFF9F43);
       icon = Icons.play_circle_filled_rounded;
-      shadows = [
-        BoxShadow(
-          color: const Color(0xFFFF9F43).withOpacity(0.4),
-          blurRadius: 12,
-          spreadRadius: 2,
-        ),
+      shadows = const [
+        BoxShadow(color: Color(0x66FF9F43), blurRadius: 12, spreadRadius: 2),
       ];
     } else {
-      cardColor = Colors.grey.shade800.withOpacity(0.3);
-      textColor = Colors.grey.shade600;
+      cardColor = const Color(0x4D424242);
+      borderColor = const Color(0x4D424242);
+      textColor = const Color(0xFF757575);
       icon = Icons.lock_rounded;
+      shadows = const [];
     }
 
     return GestureDetector(
       onTap: isLocked
           ? null
           : () {
-              Navigator.push(
-                context,
-                MaterialPageRoute<void>(
-                  builder: (_) => LevelPuzzleScreen(level: levelNumber),
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => LevelPuzzleScreen(level: levelNumber),
                 ),
               );
             },
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isLocked
-                ? Colors.grey.shade800.withOpacity(0.3)
-                : textColor.withOpacity(0.3),
-            width: 1.5,
-          ),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [cardColor, cardColor.withOpacity(0.5)],
-          ),
+          borderRadius: BorderRadius.circular(7),
+          border: Border.all(color: borderColor, width: 1.5),
+          color: cardColor,
           boxShadow: shadows,
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(icon, color: textColor, size: 28),
-                  const SizedBox(height: 6),
-                  Text(
-                    '$levelNumber',
-                    style: TextStyle(
-                      color: isLocked ? Colors.grey.shade600 : Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  if (isCompleted)
-                    Container(
-                      margin: const EdgeInsets.only(top: 4),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: const Color(0xFF4CAF50).withOpacity(0.2),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.star,
-                            color: const Color(0xFFFFD700),
-                            size: 12,
-                          ),
-                          const SizedBox(width: 2),
-                          Text(
-                            '3',
-                            style: TextStyle(
-                              color: const Color(0xFFFFD700),
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: textColor, size: 28),
+              const SizedBox(height: 6),
+              Text(
+                '$levelNumber',
+                style: TextStyle(
+                  color: isLocked ? const Color(0xFF757575) : Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
               ),
-            ),
+              if (isCompleted)
+                Container(
+                  margin: const EdgeInsets.only(top: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(4),
+                    color: const Color(0x334CAF50),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.star, color: Color(0xFFFFD700), size: 12),
+                      SizedBox(width: 2),
+                      Text(
+                        '3',
+                        style: TextStyle(
+                          color: Color(0xFFFFD700),
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
           ),
         ),
       ),

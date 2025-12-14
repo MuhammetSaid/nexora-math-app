@@ -62,14 +62,13 @@ class HomeScreen extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: AppSpacing.xl),
-                            _OrbitalBadge(),
+                            const _OrbitalBadge(),
                             const SizedBox(height: AppSpacing.xxl + 8),
                             GlowButton(
                               label: l10n.startGame,
                               height: 68,
                               onTap: () {
-                                Navigator.push(
-                                  context,
+                                Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) =>
                                         const GameModeScreen(),
@@ -105,11 +104,11 @@ class HomeScreen extends StatelessWidget {
                           children: <Widget>[
                             _BottomMetaRow(
                               items: <_BottomMeta>[
-                                _BottomMeta(
+                                const _BottomMeta(
                                   icon: Icons.psychology_outlined,
                                   label: 'IQ',
                                 ),
-                                _BottomMeta(
+                                const _BottomMeta(
                                   icon: Icons.emoji_events_outlined,
                                   label: 'Leaderboard',
                                 ),
@@ -117,15 +116,15 @@ class HomeScreen extends StatelessWidget {
                                   icon: Icons.settings_outlined,
                                   label: 'Settings',
                                   onTap: () {
-                                    Navigator.push(
-                                      context,
+                                    Navigator.of(context).push(
                                       MaterialPageRoute(
-                                        builder: (_) => const SettingsScreen(),
+                                        builder: (context) =>
+                                            const SettingsScreen(),
                                       ),
                                     );
                                   },
                                 ),
-                                _BottomMeta(
+                                const _BottomMeta(
                                   icon: Icons.account_circle_outlined,
                                   label: 'Session',
                                 ),
@@ -173,6 +172,8 @@ class HomeScreen extends StatelessWidget {
 
 /// Central icon badge to mimic the geometric graphic in the reference.
 class _OrbitalBadge extends StatelessWidget {
+  const _OrbitalBadge();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -184,13 +185,15 @@ class _OrbitalBadge extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           child: Image.asset(
             'assets/images/orbital.png',
-            width: 250,
+            width: 280,
             height: 250,
             fit: BoxFit.contain,
+            cacheWidth: 250,
+            cacheHeight: 250,
             errorBuilder:
                 (BuildContext context, Object error, StackTrace? stackTrace) {
                   debugPrint('Orbital asset missing: $error');
-                  return Icon(
+                  return const Icon(
                     Icons.language,
                     color: AppColors.goldSoft,
                     size: 88,

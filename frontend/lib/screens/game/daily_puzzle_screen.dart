@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
@@ -13,6 +15,8 @@ import '../../widgets/game/numeric_keypad.dart';
 import '../../widgets/game/puzzle_card.dart';
 import 'question_screen.dart';
 
+import '../../services/api/level_service.dart';
+
 class DailyPuzzleScreen extends StatefulWidget {
   const DailyPuzzleScreen({super.key});
 
@@ -24,12 +28,49 @@ class _DailyPuzzleScreenState extends State<DailyPuzzleScreen> {
   late final PuzzleRepository _repository;
   late final Future<Puzzle> _puzzleFuture;
   final AnswerController _answer = AnswerController();
+  Map<String, dynamic>? _levelData; // Backend'den gelen level verisi
+  bool _isLoadingLevel = true; // Backend'den veri yükleniyor mu?
+  bool _hasError = false; // Hata oluştu mu?
+  late final int level; // Rastgele level (1-2 arası)
+  Future<void> _fetchLevelFromBackend() async {
+    setState(() {
+      _isLoadingLevel = true;
+      _hasError = false;
+    });
+
+    try {
+      final levelData = await LevelService.getLevel(level);
+
+      if (levelData != null) {
+        setState(() {
+          _levelData = levelData;
+          _isLoadingLevel = false;
+        });
+      } else {
+        setState(() {
+          _isLoadingLevel = false;
+          _hasError = true;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isLoadingLevel = false;
+        _hasError = true;
+      });
+      print('Hata oluştu: $e');
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    // Rastgele 1-2 arası level oluştur
+    level = Random().nextInt(8) + 1;
     _repository = const MockPuzzleRepository();
-    _puzzleFuture = _repository.fetchLevel(0);
+    _puzzleFuture = _repository.fetchLevel(level);
+
+    // Backend'den level bilgisini çek
+    _fetchLevelFromBackend();
   }
 
   @override
@@ -57,24 +98,112 @@ class _DailyPuzzleScreenState extends State<DailyPuzzleScreen> {
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 Expanded(
-                  child: FutureBuilder<Puzzle>(
-                    future: _puzzleFuture,
-                    builder: (
-                      BuildContext context,
-                      AsyncSnapshot<Puzzle> snapshot,
-                    ) {
-                      final Puzzle puzzle = snapshot.data ??
-                          Puzzle(
-                            level: 0,
-                            lines: const <String>[
-                              '5, 3 = 28',
-                              '7, 6 = 55',
-                              '4, 5 = 21',
-                              '3, 8 = ?',
-                            ],
-                          );
-                      return PuzzleCard(lines: puzzle.lines);
-                    },
+                  child: Stack(
+                    children: <Widget>[
+                      FutureBuilder<Puzzle>(
+                        future: _puzzleFuture,
+                        builder:
+                            (
+                              BuildContext context,
+                              AsyncSnapshot<Puzzle> snapshot,
+                            ) {
+                              final Puzzle puzzle =
+                                  snapshot.data ??
+                                  Puzzle(
+                                    level: level,
+                                    lines: const <String>[
+                                      '5, 3 = 28',
+                                      '7, 6 = 55',
+                                      '4, 5 = 21',
+                                      '3, 8 = ?',
+                                    ],
+                                  );
+                              return PuzzleCard(
+                                lines: puzzle.lines,
+                                imagePath: _levelData?['image_path'] ?? '',
+                                level: level,
+                              );
+                            },
+                      ),
+                      // Loading overlay
+                      if (_isLoadingLevel)
+                        Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.background.withOpacity(0.85),
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
+                          ),
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    AppColors.goldAccent,
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.md),
+                                Text(
+                                  'Level yükleniyor...',
+                                  style: AppTextStyles.body.copyWith(
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      // Hata durumu
+                      if (_hasError && !_isLoadingLevel)
+                        Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.background.withOpacity(0.85),
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
+                          ),
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Icon(
+                                  Icons.error_outline,
+                                  color: AppColors.goldAccent,
+                                  size: 48,
+                                ),
+                                const SizedBox(height: AppSpacing.md),
+                                Text(
+                                  'Level yüklenemedi',
+                                  style: AppTextStyles.heading3.copyWith(
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.sm),
+                                Text(
+                                  'Lütfen tekrar deneyin',
+                                  style: AppTextStyles.body.copyWith(
+                                    color: AppColors.mutedText,
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.lg),
+                                ElevatedButton(
+                                  onPressed: _fetchLevelFromBackend,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.goldAccent,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.xl,
+                                      vertical: AppSpacing.md,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'Tekrar Dene',
+                                    style: AppTextStyles.buttonLabel.copyWith(
+                                      color: AppColors.background,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
@@ -87,6 +216,11 @@ class _DailyPuzzleScreenState extends State<DailyPuzzleScreen> {
                   answerLabel: l10n.answerLabel,
                   enterLabel: l10n.enter,
                   hintLabel: l10n.hint,
+                  answer: _levelData?['answer_value']?.toString() ?? '',
+                  hint1: _levelData?['hint1']?.toString() ?? '',
+                  hint2: _levelData?['hint2']?.toString() ?? '',
+                  solutionExplanation:
+                      _levelData?['solution_explanation']?.toString() ?? '',
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 NumericKeypad(
@@ -107,7 +241,9 @@ class _DailyPuzzleScreenState extends State<DailyPuzzleScreen> {
   }
 
   void _showSoonSnack(BuildContext context, AppLocalizations l10n) {
-    final ScaffoldMessengerState? messenger = ScaffoldMessenger.maybeOf(context);
+    final ScaffoldMessengerState? messenger = ScaffoldMessenger.maybeOf(
+      context,
+    );
     messenger?.hideCurrentSnackBar();
     messenger?.showSnackBar(
       SnackBar(
