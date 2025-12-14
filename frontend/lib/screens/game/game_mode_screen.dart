@@ -6,7 +6,7 @@ import '../levels/levels_screen.dart';
 import 'question_screen.dart';
 import '../settings/settings_screen.dart';
 import '../../l10n/app_localizations.dart';
-
+import 'daily_puzzle_screen.dart';
 class GameModeScreen extends StatelessWidget {
   const GameModeScreen({super.key});
 
@@ -62,6 +62,13 @@ class GameModeScreen extends StatelessWidget {
                           Color(0x4D6B4CE6),
                           Color(0x339B6CE6),
                         ],
+                        onTap: (context) {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const DailyPuzzleScreen(),
+                            ),
+                          );
+                        },
                       ),
                       _buildGameModeCard(
                         icon: Icons.smart_toy_rounded,

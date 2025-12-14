@@ -16,6 +16,10 @@ class AnswerBar extends StatelessWidget {
     required this.answerLabel,
     required this.enterLabel,
     required this.hintLabel,
+    required this.answer,
+    required this.hint1,
+    required this.hint2,
+    required this.solutionExplanation,
   });
 
   final ValueListenable<String> answerListenable;
@@ -26,12 +30,19 @@ class AnswerBar extends StatelessWidget {
   final String answerLabel;
   final String enterLabel;
   final String hintLabel;
+  final String answer;
+  final String hint1;
+  final String hint2;
+  final String solutionExplanation;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 64,
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: AppColors.keypadSurface,
         borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -59,21 +70,182 @@ class AnswerBar extends StatelessWidget {
             tooltip: hintLabel,
           ),
           const SizedBox(width: AppSpacing.sm),
-          _EnterButton(
-            label: enterLabel,
-            onTap: onEnter,
-          ),
+          _EnterButton(label: enterLabel, onTap: () => _handleEnter(context)),
         ],
       ),
+    );
+  }
+
+  void _handleEnter(BuildContext context) {
+    final String userAnswer = answerListenable.value.trim();
+
+    // Cevap boşsa hiçbir şey yapma
+    if (userAnswer.isEmpty) {
+      return;
+    }
+
+    // Cevabı kontrol et
+    final String correctAnswer = answer.toString().trim();
+    if (userAnswer == correctAnswer) {
+      // Doğru cevap!
+      _showSuccessDialog(context);
+    } else {
+      // Yanlış cevap
+      _showErrorDialog(context);
+    }
+  }
+
+  void _showSuccessDialog(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.75),
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            decoration: BoxDecoration(
+              color: AppColors.panel,
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              border: Border.all(color: AppColors.goldAccent, width: 2),
+              boxShadow: const <BoxShadow>[
+                BoxShadow(
+                  color: Color(0x662C2410),
+                  blurRadius: 32,
+                  offset: Offset(0, 14),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                // Başarı ikonu
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: AppColors.goldAccent.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.check_circle_outline,
+                    color: AppColors.goldAccent,
+                    size: 48,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                Text(
+                  'Tebrikler!',
+                  style: AppTextStyles.heading2.copyWith(
+                    color: AppColors.textPrimary,
+                    fontSize: 28,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  'Doğru cevabı buldunuz!',
+                  style: AppTextStyles.body.copyWith(
+                    color: AppColors.mutedText,
+                    fontSize: 16,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.xl),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    onClearAll();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.goldAccent,
+                    minimumSize: const Size(double.infinity, 48),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                    ),
+                  ),
+                  child: Text(
+                    'Sonraki Level',
+                    style: AppTextStyles.buttonLabel.copyWith(
+                      color: AppColors.background,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showErrorDialog(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.65),
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            decoration: BoxDecoration(
+              color: AppColors.panel,
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              border: Border.all(color: Colors.redAccent, width: 2),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Icon(Icons.close_rounded, color: Colors.redAccent, size: 64),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  'Yanlış Cevap!',
+                  style: AppTextStyles.heading3.copyWith(
+                    color: AppColors.textPrimary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  'Tekrar deneyin veya ipucu alın',
+                  style: AppTextStyles.body.copyWith(
+                    color: AppColors.mutedText,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.redAccent,
+                    minimumSize: const Size(double.infinity, 48),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                    ),
+                  ),
+                  child: Text(
+                    'Tekrar Dene',
+                    style: AppTextStyles.buttonLabel.copyWith(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
 
 class _AnswerField extends StatelessWidget {
-  const _AnswerField({
-    required this.label,
-    required this.answerListenable,
-  });
+  const _AnswerField({required this.label, required this.answerListenable});
 
   final String label;
   final ValueListenable<String> answerListenable;
@@ -145,10 +317,7 @@ class _SquareButton extends StatelessWidget {
       return button;
     }
 
-    return Tooltip(
-      message: tooltip!,
-      child: button,
-    );
+    return Tooltip(message: tooltip!, child: button);
   }
 }
 

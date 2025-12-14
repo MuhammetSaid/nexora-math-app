@@ -8,10 +8,13 @@ class PuzzleCard extends StatelessWidget {
   const PuzzleCard({
     super.key,
     required this.lines,
+    required this.imagePath,
+    required this.level,
   });
 
   final List<String> lines;
-
+  final String imagePath;
+  final int level;
   @override
   Widget build(BuildContext context) {
     final String content = lines.join('\n');
@@ -23,7 +26,7 @@ class PuzzleCard extends StatelessWidget {
         vertical: AppSpacing.xl + AppSpacing.sm,
       ),
       decoration: BoxDecoration(
-        gradient: AppColors.panelGradient,
+        color: Color(0xFF1e1e1e),
         borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: AppColors.panelBorder),
         boxShadow: const <BoxShadow>[
@@ -35,10 +38,8 @@ class PuzzleCard extends StatelessWidget {
         ],
       ),
       child: Center(
-        child: Text(
-          content,
-          textAlign: TextAlign.center,
-          style: AppTextStyles.puzzleText,
+        child: Image.asset(
+          imagePath,
         ),
       ),
     );
