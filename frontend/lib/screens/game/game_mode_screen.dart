@@ -64,6 +64,14 @@ class GameModeScreen extends StatelessWidget {
                           const Color(0xFF6B4CE6).withOpacity(0.3),
                           const Color(0xFF9B6CE6).withOpacity(0.2),
                         ],
+                        onTap: (context) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute<void>(
+                              builder: (_) => const DailyPuzzleScreen(),
+                            ),
+                          );
+                        },
                       ),
                       _buildGameModeCard(
                         icon: Icons.smart_toy_rounded,
