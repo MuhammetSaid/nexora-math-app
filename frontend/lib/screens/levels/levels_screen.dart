@@ -1,11 +1,64 @@
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../../models/user_profile.dart';
+import '../../services/api/level_service.dart';
 import '../game/question_screen.dart';
 
-class LevelsScreen extends StatelessWidget {
-  const LevelsScreen({super.key});
-  final int currentLevel = 12;
+class LevelsScreen extends StatefulWidget {
+  const LevelsScreen({super.key, this.profile, this.onProfileUpdated});
+
+  final UserProfile? profile;
+  final ValueChanged<UserProfile>? onProfileUpdated;
+
+  @override
+  State<LevelsScreen> createState() => _LevelsScreenState();
+}
+
+class _LevelsScreenState extends State<LevelsScreen> {
+  List<Map<String, dynamic>> _levels = <Map<String, dynamic>>[];
+  bool _loading = true;
+  bool _error = false;
+  UserProfile? _activeProfile;
+
+  int get _userLevel => _activeProfile?.level ?? 1;
+
+  @override
+  void initState() {
+    super.initState();
+    _activeProfile = widget.profile;
+    _loadLevels();
+  }
+
+  Future<void> _loadLevels() async {
+    setState(() {
+      _loading = true;
+      _error = false;
+    });
+    try {
+      final List<Map<String, dynamic>> levels = await LevelService.getLevels();
+      if (!mounted) return;
+      setState(() {
+        _levels = levels;
+        _loading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _error = true;
+        _loading = false;
+      });
+    }
+  }
+
+  void _handleProfileUpdated(UserProfile profile) {
+    widget.onProfileUpdated?.call(profile);
+    if (!mounted) return;
+    setState(() {
+      _activeProfile = profile;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
@@ -14,17 +67,12 @@ class LevelsScreen extends StatelessWidget {
         decoration: const BoxDecoration(color: Color(0xFF1e1e1e)),
         child: SafeArea(
           child: Column(
-            children: [
-              // Header
+            children: <Widget>[
               _buildHeader(context, l10n),
               const SizedBox(height: 20),
-
-              // Progress Info
               _buildProgressInfo(l10n),
               const SizedBox(height: 25),
-
-              // Levels Grid
-              Expanded(child: _buildLevelsGrid()),
+              Expanded(child: _buildLevelsSection()),
             ],
           ),
         ),
@@ -36,10 +84,9 @@ class LevelsScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Row(
-        children: [
-          // Geri Butonu
+        children: <Widget>[
           GestureDetector(
-            onTap: () => Navigator.pop(context),
+            onTap: () => Navigator.pop(context, _activeProfile),
             child: Container(
               width: 45,
               height: 45,
@@ -49,7 +96,7 @@ class LevelsScreen extends StatelessWidget {
                 gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [Color(0x14FFFFFF), Color(0x08FFFFFF)],
+                  colors: <Color>[Color(0x14FFFFFF), Color(0x08FFFFFF)],
                 ),
               ),
               child: const Icon(
@@ -60,12 +107,10 @@ class LevelsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 15),
-
-          // Başlık
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+              children: <Widget>[
                 const Text(
                   'SEVİYELİ OYNA',
                   style: TextStyle(
@@ -86,8 +131,6 @@ class LevelsScreen extends StatelessWidget {
               ],
             ),
           ),
-
-          // Info Butonu
           Container(
             width: 45,
             height: 45,
@@ -97,7 +140,7 @@ class LevelsScreen extends StatelessWidget {
               gradient: const LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Color(0x14FFFFFF), Color(0x08FFFFFF)],
+                colors: <Color>[Color(0x14FFFFFF), Color(0x08FFFFFF)],
               ),
             ),
             child: const Icon(
@@ -112,6 +155,10 @@ class LevelsScreen extends StatelessWidget {
   }
 
   Widget _buildProgressInfo(AppLocalizations l10n) {
+    final double progress = _levels.isEmpty
+        ? 0
+        : (_userLevel / _levels.length).clamp(0, 1);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Container(
@@ -122,17 +169,17 @@ class LevelsScreen extends StatelessWidget {
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0x14FFFFFF), Color(0x08FFFFFF)],
+            colors: <Color>[Color(0x14FFFFFF), Color(0x08FFFFFF)],
           ),
         ),
         child: Column(
-          children: [
+          children: <Widget>[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
+              children: <Widget>[
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: <Widget>[
                     const Text(
                       'İlerleme',
                       style: TextStyle(
@@ -143,7 +190,7 @@ class LevelsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '$currentLevel / 100',
+                      '${_userLevel} / ${_levels.isEmpty ? "?" : _levels.length}',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 28,
@@ -167,8 +214,8 @@ class LevelsScreen extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    '%$currentLevel',
-                    style: TextStyle(
+                    '${(progress * 100).floor()}%',
+                    style: const TextStyle(
                       color: Color(0xFFFF9F43),
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -180,10 +227,11 @@ class LevelsScreen extends StatelessWidget {
             const SizedBox(height: 15),
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: const LinearProgressIndicator(
-                value: 0.15,
-                backgroundColor: Color(0x1AFFFFFF),
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF9F43)),
+              child: LinearProgressIndicator(
+                value: progress,
+                backgroundColor: const Color(0x1AFFFFFF),
+                valueColor:
+                    const AlwaysStoppedAnimation<Color>(Color(0xFFFF9F43)),
                 minHeight: 8,
               ),
             ),
@@ -193,7 +241,39 @@ class LevelsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLevelsGrid() {
+  Widget _buildLevelsSection() {
+    if (_loading) {
+      return const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF9F43)),
+        ),
+      );
+    }
+
+    if (_error) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            const Icon(Icons.error_outline, color: Color(0xFFFF9F43), size: 32),
+            const SizedBox(height: 8),
+            const Text(
+              'Level verisi alınamadı',
+              style: TextStyle(color: Colors.white70),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: _loadLevels,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFF9F43),
+              ),
+              child: const Text('Tekrar Dene'),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: GridView.builder(
@@ -204,12 +284,13 @@ class LevelsScreen extends StatelessWidget {
           crossAxisSpacing: 9,
           childAspectRatio: 0.85,
         ),
-        itemCount: 100,
-        itemBuilder: (context, index) {
-          int levelNumber = index + 1;
-          bool isCompleted = levelNumber < currentLevel;
-          bool isCurrent = levelNumber == currentLevel;
-          bool isLocked = levelNumber > currentLevel;
+        itemCount: _levels.length,
+        itemBuilder: (BuildContext context, int index) {
+          final Map<String, dynamic> level = _levels[index];
+          final int levelNumber = level['level_no'] as int? ?? index + 1;
+          final bool isCompleted = levelNumber < _userLevel;
+          final bool isCurrent = levelNumber == _userLevel;
+          final bool isLocked = levelNumber > _userLevel;
 
           return _buildLevelCard(
             context: context,
@@ -241,13 +322,13 @@ class LevelsScreen extends StatelessWidget {
       borderColor = const Color(0x4D4CAF50);
       textColor = const Color(0xFF4CAF50);
       icon = Icons.check_circle_rounded;
-      shadows = const [];
+      shadows = const <BoxShadow>[];
     } else if (isCurrent) {
       cardColor = const Color(0x40FF9F43);
       borderColor = const Color(0x4DFF9F43);
       textColor = const Color(0xFFFF9F43);
       icon = Icons.play_circle_filled_rounded;
-      shadows = const [
+      shadows = const <BoxShadow>[
         BoxShadow(color: Color(0x66FF9F43), blurRadius: 12, spreadRadius: 2),
       ];
     } else {
@@ -255,7 +336,7 @@ class LevelsScreen extends StatelessWidget {
       borderColor = const Color(0x4D424242);
       textColor = const Color(0xFF757575);
       icon = Icons.lock_rounded;
-      shadows = const [];
+      shadows = const <BoxShadow>[];
     }
 
     return GestureDetector(
@@ -264,7 +345,11 @@ class LevelsScreen extends StatelessWidget {
           : () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => LevelPuzzleScreen(level: levelNumber),
+                  builder: (BuildContext context) => LevelPuzzleScreen(
+                    level: levelNumber,
+                    profile: _activeProfile,
+                    onProfileUpdated: _handleProfileUpdated,
+                  ),
                 ),
               );
             },
@@ -280,7 +365,7 @@ class LevelsScreen extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+            children: <Widget>[
               Icon(icon, color: textColor, size: 28),
               const SizedBox(height: 6),
               Text(
@@ -305,7 +390,7 @@ class LevelsScreen extends StatelessWidget {
                   ),
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: [
+                    children: <Widget>[
                       Icon(Icons.star, color: Color(0xFFFFD700), size: 12),
                       SizedBox(width: 2),
                       Text(
