@@ -194,6 +194,36 @@ abstract class AppLocalizations {
   /// **'Profile Settings'**
   String get profileSettings;
 
+  /// No description provided for @changeAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Avatar'**
+  String get changeAvatar;
+
+  /// No description provided for @loginAnotherAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Log in with another account'**
+  String get loginAnotherAccount;
+
+  /// No description provided for @profileName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get profileName;
+
+  /// No description provided for @profileEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get profileEmail;
+
+  /// No description provided for @profilePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get profilePassword;
+
   /// No description provided for @achievements.
   ///
   /// In en, this message translates to:

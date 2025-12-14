@@ -59,6 +59,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileSettings => 'Profile Settings';
 
   @override
+  String get changeAvatar => 'Change Avatar';
+
+  @override
+  String get loginAnotherAccount => 'Log in with another account';
+
+  @override
+  String get profileName => 'Name';
+
+  @override
+  String get profileEmail => 'Email';
+
+  @override
+  String get profilePassword => 'Password';
+
+  @override
   String get achievements => 'Achievements';
 
   @override

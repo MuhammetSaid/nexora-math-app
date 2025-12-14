@@ -12,6 +12,7 @@ import '../../widgets/game/level_app_bar.dart';
 import '../../widgets/game/nexora_background.dart';
 import '../../widgets/game/numeric_keypad.dart';
 import '../../widgets/game/puzzle_card.dart';
+import '../profile/profile_settings_screen.dart';
 import '../settings/settings_screen.dart';
 
 class LevelPuzzleScreen extends StatefulWidget {
@@ -232,6 +233,14 @@ class _LevelPuzzleScreenState extends State<LevelPuzzleScreen> {
                 ),
                 const SizedBox(height: AppSpacing.md),
                 _FooterMetaBar(
+                  onProfileTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) => const ProfileSettingsScreen(),
+                      ),
+                    );
+                  },
                   onSettingsTap: () {
                     Navigator.push(
                       context,
@@ -449,8 +458,9 @@ class _PremiumButton extends StatelessWidget {
 }
 
 class _FooterMetaBar extends StatelessWidget {
-  const _FooterMetaBar({this.onSettingsTap});
+  const _FooterMetaBar({this.onProfileTap, this.onSettingsTap});
 
+  final VoidCallback? onProfileTap;
   final VoidCallback? onSettingsTap;
 
   @override
@@ -469,7 +479,11 @@ class _FooterMetaBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           const _FooterMeta(icon: Icons.emoji_events_outlined, label: 'Trophy'),
-          const _FooterMeta(icon: Icons.person_outline, label: 'Profile'),
+          _FooterMeta(
+            icon: Icons.person_outline,
+            label: 'Profile',
+            onTap: onProfileTap,
+          ),
           _FooterMeta(
             icon: Icons.settings_outlined,
             label: 'Settings',

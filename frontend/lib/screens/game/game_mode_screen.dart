@@ -7,6 +7,7 @@ import 'question_screen.dart';
 import '../settings/settings_screen.dart';
 import '../../l10n/app_localizations.dart';
 import 'daily_puzzle_screen.dart';
+import '../profile/profile_settings_screen.dart';
 class GameModeScreen extends StatelessWidget {
   const GameModeScreen({super.key});
 
@@ -23,7 +24,7 @@ class GameModeScreen extends StatelessWidget {
             child: Column(
               children: [
                 // Kullanıcı Profil Kartı
-                _buildProfileCard(),
+                _buildProfileCard(context),
                 const SizedBox(height: 50),
 
                 // Oyun Modları Grid (2x2)
@@ -140,76 +141,79 @@ class GameModeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileCard() {
+  Widget _buildProfileCard(BuildContext context) {
     return RepaintBoundary(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.white30, width: 2),
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0x99C6C6C6), Color(0x66000000)],
-          ),
-        ),
-        child: Row(
-          children: [
-            // Profil Resmi
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xE6363F41), width: 3),
-              ),
-              child: const ClipOval(
-                child: Icon(Icons.person, color: Colors.white, size: 38),
-              ),
+      child: GestureDetector(
+        onTap: () => _openProfile(context),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.white30, width: 2),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0x99C6C6C6), Color(0x66000000)],
             ),
-            const SizedBox(width: 10),
-
-            // İsim
-            const Expanded(
-              child: Text(
-                'John Doe',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.5,
+          ),
+          child: Row(
+            children: [
+              // Profil Resmi
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: const Color(0xE6363F41), width: 3),
+                ),
+                child: const ClipOval(
+                  child: Icon(Icons.person, color: Colors.white, size: 38),
                 ),
               ),
-            ),
+              const SizedBox(width: 10),
 
-            // IQ Puanı
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image.asset(
-                    'assets/elmas.png',
-                    width: 27,
-                    height: 27,
-                    fit: BoxFit.contain,
-                    cacheWidth: 54,
-                    cacheHeight: 54,
+              // İsim
+              const Expanded(
+                child: Text(
+                  'John Doe',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
                   ),
-                  const SizedBox(width: 7),
-                  const Text(
-                    '3,450',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1,
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ],
+
+              // IQ Puanı
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset(
+                      'assets/elmas.png',
+                      width: 27,
+                      height: 27,
+                      fit: BoxFit.contain,
+                      cacheWidth: 54,
+                      cacheHeight: 54,
+                    ),
+                    const SizedBox(width: 7),
+                    const Text(
+                      '3,450',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -475,6 +479,14 @@ class GameModeScreen extends StatelessWidget {
     );
   }
 
+  void _openProfile(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => const ProfileSettingsScreen(),
+      ),
+    );
+  }
+
   Widget _buildBottomNavigation(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -491,7 +503,11 @@ class GameModeScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _buildNavItem(Icons.emoji_events, 'Trophy'),
-          _buildNavItem(Icons.person_outline, 'Profile'),
+          _buildNavItem(
+            Icons.person_outline,
+            'Profile',
+            onTap: () => _openProfile(context),
+          ),
           _buildNavItem(
             Icons.settings_outlined,
             'Settings',

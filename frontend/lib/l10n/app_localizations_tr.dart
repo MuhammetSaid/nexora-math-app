@@ -59,6 +59,21 @@ class AppLocalizationsTr extends AppLocalizations {
   String get profileSettings => 'Profil Ayarları';
 
   @override
+  String get changeAvatar => 'Avatarı Değiştir';
+
+  @override
+  String get loginAnotherAccount => 'Başka bir hesapla giriş yap';
+
+  @override
+  String get profileName => 'İsim';
+
+  @override
+  String get profileEmail => 'E-posta';
+
+  @override
+  String get profilePassword => 'Şifre';
+
+  @override
   String get achievements => 'Başarılar';
 
   @override
