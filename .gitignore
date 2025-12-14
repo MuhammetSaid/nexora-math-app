@@ -40,4 +40,5 @@ logs/
 # Environment
 *.env
 !.env.example
-
+DB
+/DB
