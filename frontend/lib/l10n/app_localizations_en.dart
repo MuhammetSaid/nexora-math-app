@@ -105,4 +105,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get totalLevels => '100 Levels';
+
+  @override
+  String get changeAvatar => 'Change Avatar';
+
+  @override
+  String get loginAnotherAccount => 'Log in with another account';
+
+  @override
+  String get name => 'Name';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get password => 'Password';
 }

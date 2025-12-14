@@ -6,6 +6,7 @@ import '../../theme/colors.dart';
 import '../../theme/text_styles.dart';
 import '../../utils/constants.dart';
 import '../../widgets/game/nexora_background.dart';
+import '../profile/profile_settings_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -67,7 +68,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _SettingsButton(
                   icon: Icons.person_outline,
                   label: l10n.profileSettings,
-                  onTap: () => _showPlaceholder(context, l10n),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) => const ProfileSettingsScreen(),
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: AppSpacing.md),
                 _SettingsButton(

@@ -38,5 +38,10 @@
   "botPlay": "Botla Oyna",
   "tournament": "Turnuva",
   "levelsPlay": "Seviyeli Oyna",
-  "totalLevels": "100 Seviye"
+  "totalLevels": "100 Seviye",
+  "changeAvatar": "Avatarı Değiştir",
+  "loginAnotherAccount": "Başka hesapla giriş yap",
+  "name": "İsim",
+  "email": "E-posta",
+  "password": "Şifre"
 }

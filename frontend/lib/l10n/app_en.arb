@@ -38,5 +38,10 @@
   "botPlay": "Play vs Bot",
   "tournament": "Tournament",
   "levelsPlay": "Play Levels",
-  "totalLevels": "100 Levels"
+  "totalLevels": "100 Levels",
+  "changeAvatar": "Change Avatar",
+  "loginAnotherAccount": "Log in with another account",
+  "name": "Name",
+  "email": "Email",
+  "password": "Password"
 }

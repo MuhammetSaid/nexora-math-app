@@ -7,6 +7,7 @@ import '../../utils/constants.dart';
 import '../../widgets/common/glow_button.dart';
 import '../settings/settings_screen.dart';
 import '../game/game_mode_screen.dart';
+import '../profile/profile_settings_screen.dart';
 
 /// Single home screen matching the provided dark gold reference.
 class HomeScreen extends StatelessWidget {
@@ -127,7 +128,15 @@ class HomeScreen extends StatelessWidget {
                                 ),
                                 _BottomMeta(
                                   icon: Icons.account_circle_outlined,
-                                  label: 'Session',
+                                  label: 'Profile',
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const ProfileSettingsScreen(),
+                                      ),
+                                    );
+                                  },
                                 ),
                               ],
                             ),

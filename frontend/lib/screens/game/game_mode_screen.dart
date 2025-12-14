@@ -7,6 +7,7 @@ import 'question_screen.dart';
 import 'daily_puzzle_screen.dart';
 import '../settings/settings_screen.dart';
 import '../../l10n/app_localizations.dart';
+import '../profile/profile_settings_screen.dart';
 
 class GameModeScreen extends StatelessWidget {
   const GameModeScreen({super.key});
@@ -568,7 +569,18 @@ class GameModeScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _buildNavItem(Icons.emoji_events, 'Trophy'),
-              _buildNavItem(Icons.person_outline, 'Profile'),
+              _buildNavItem(
+                Icons.person_outline,
+                'Profile',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) => const ProfileSettingsScreen(),
+                    ),
+                  );
+                },
+              ),
               _buildNavItem(
                 Icons.settings_outlined,
                 'Settings',

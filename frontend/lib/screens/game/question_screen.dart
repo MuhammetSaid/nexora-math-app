@@ -12,6 +12,7 @@ import '../../widgets/game/nexora_background.dart';
 import '../../widgets/game/numeric_keypad.dart';
 import '../../widgets/game/puzzle_card.dart';
 import '../settings/settings_screen.dart';
+import '../profile/profile_settings_screen.dart';
 
 class LevelPuzzleScreen extends StatefulWidget {
   const LevelPuzzleScreen({super.key, required this.level});
@@ -323,7 +324,18 @@ class _FooterMetaBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           const _FooterMeta(icon: Icons.emoji_events_outlined, label: 'Trophy'),
-          const _FooterMeta(icon: Icons.person_outline, label: 'Profile'),
+          _FooterMeta(
+            icon: Icons.person_outline,
+            label: 'Profile',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (_) => const ProfileSettingsScreen(),
+                ),
+              );
+            },
+          ),
           _FooterMeta(
             icon: Icons.settings_outlined,
             label: 'Settings',

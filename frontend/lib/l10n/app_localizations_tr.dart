@@ -105,4 +105,19 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get totalLevels => '100 Seviye';
+
+  @override
+  String get changeAvatar => 'Avatarı Değiştir';
+
+  @override
+  String get loginAnotherAccount => 'Başka hesapla giriş yap';
+
+  @override
+  String get name => 'İsim';
+
+  @override
+  String get email => 'E-posta';
+
+  @override
+  String get password => 'Şifre';
 }

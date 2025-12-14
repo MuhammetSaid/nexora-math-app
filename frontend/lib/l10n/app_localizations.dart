@@ -289,6 +289,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'100 Levels'**
   String get totalLevels;
+
+  /// No description provided for @changeAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Avatar'**
+  String get changeAvatar;
+
+  /// No description provided for @loginAnotherAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Log in with another account'**
+  String get loginAnotherAccount;
+
+  /// No description provided for @name.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get name;
+
+  /// No description provided for @email.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get email;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
 }
 
 class _AppLocalizationsDelegate
