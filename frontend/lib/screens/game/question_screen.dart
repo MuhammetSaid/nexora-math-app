@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/game/puzzle.dart';
 import '../../services/game/puzzle_repository.dart';
+import '../../services/api/level_service.dart';
 import '../../theme/colors.dart';
 import '../../theme/text_styles.dart';
 import '../../utils/constants.dart';
@@ -26,12 +27,49 @@ class _LevelPuzzleScreenState extends State<LevelPuzzleScreen> {
   late final PuzzleRepository _repository;
   late final Future<Puzzle> _puzzleFuture;
   final AnswerController _answer = AnswerController();
+  Map<String, dynamic>? _levelData; // Backend'den gelen level verisi
+  bool _isLoadingLevel = true; // Backend'den veri yükleniyor mu?
+  bool _hasError = false; // Hata oluştu mu?
 
   @override
   void initState() {
     super.initState();
     _repository = const MockPuzzleRepository();
     _puzzleFuture = _repository.fetchLevel(widget.level);
+
+    // Backend'den level bilgisini çek
+    _fetchLevelFromBackend();
+  }
+
+  /// Backend'den level bilgisini çeker ve konsola yazdırır
+  Future<void> _fetchLevelFromBackend() async {
+    setState(() {
+      _isLoadingLevel = true;
+      _hasError = false;
+    });
+
+    try {
+      final levelData = await LevelService.getLevel(widget.level);
+
+      if (levelData != null) {
+        setState(() {
+          _levelData = levelData;
+          _isLoadingLevel = false;
+        });
+      } else {
+        setState(() {
+          _isLoadingLevel = false;
+          _hasError = true;
+        });
+        print('Level bilgisi alınamadı!');
+      }
+    } catch (e) {
+      setState(() {
+        _isLoadingLevel = false;
+        _hasError = true;
+      });
+      print('Hata oluştu: $e');
+    }
   }
 
   @override
@@ -59,24 +97,112 @@ class _LevelPuzzleScreenState extends State<LevelPuzzleScreen> {
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 Expanded(
-                  child: FutureBuilder<Puzzle>(
-                    future: _puzzleFuture,
-                    builder: (
-                      BuildContext context,
-                      AsyncSnapshot<Puzzle> snapshot,
-                    ) {
-                      final Puzzle puzzle = snapshot.data ??
-                          Puzzle(
-                            level: widget.level,
-                            lines: const <String>[
-                              '5, 3 = 28',
-                              '7, 6 = 55',
-                              '4, 5 = 21',
-                              '3, 8 = ?',
-                            ],
-                          );
-                      return PuzzleCard(lines: puzzle.lines);
-                    },
+                  child: Stack(
+                    children: <Widget>[
+                      FutureBuilder<Puzzle>(
+                        future: _puzzleFuture,
+                        builder:
+                            (
+                              BuildContext context,
+                              AsyncSnapshot<Puzzle> snapshot,
+                            ) {
+                              final Puzzle puzzle =
+                                  snapshot.data ??
+                                  Puzzle(
+                                    level: widget.level,
+                                    lines: const <String>[
+                                      '5, 3 = 28',
+                                      '7, 6 = 55',
+                                      '4, 5 = 21',
+                                      '3, 8 = ?',
+                                    ],
+                                  );
+                              return PuzzleCard(
+                                lines: puzzle.lines,
+                                imagePath: _levelData?['image_path'] ?? '',
+                                level: widget.level,
+                              );
+                            },
+                      ),
+                      // Loading overlay
+                      if (_isLoadingLevel)
+                        Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.background.withOpacity(0.85),
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
+                          ),
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    AppColors.goldAccent,
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.md),
+                                Text(
+                                  'Level yükleniyor...',
+                                  style: AppTextStyles.body.copyWith(
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      // Hata durumu
+                      if (_hasError && !_isLoadingLevel)
+                        Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.background.withOpacity(0.85),
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
+                          ),
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Icon(
+                                  Icons.error_outline,
+                                  color: AppColors.goldAccent,
+                                  size: 48,
+                                ),
+                                const SizedBox(height: AppSpacing.md),
+                                Text(
+                                  'Level yüklenemedi',
+                                  style: AppTextStyles.heading3.copyWith(
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.sm),
+                                Text(
+                                  'Lütfen tekrar deneyin',
+                                  style: AppTextStyles.body.copyWith(
+                                    color: AppColors.mutedText,
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.lg),
+                                ElevatedButton(
+                                  onPressed: _fetchLevelFromBackend,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.goldAccent,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.xl,
+                                      vertical: AppSpacing.md,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'Tekrar Dene',
+                                    style: AppTextStyles.buttonLabel.copyWith(
+                                      color: AppColors.background,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
@@ -89,6 +215,11 @@ class _LevelPuzzleScreenState extends State<LevelPuzzleScreen> {
                   answerLabel: l10n.answerLabel,
                   enterLabel: l10n.enter,
                   hintLabel: l10n.hint,
+                  answer: _levelData?['answer_value']?.toString() ?? '',
+                  hint1: _levelData?['hint1']?.toString() ?? '',
+                  hint2: _levelData?['hint2']?.toString() ?? '',
+                  solutionExplanation:
+                      _levelData?['solution_explanation']?.toString() ?? '',
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 NumericKeypad(
@@ -119,7 +250,9 @@ class _LevelPuzzleScreenState extends State<LevelPuzzleScreen> {
   }
 
   void _showSoonSnack(BuildContext context, AppLocalizations l10n) {
-    final ScaffoldMessengerState? messenger = ScaffoldMessenger.maybeOf(context);
+    final ScaffoldMessengerState? messenger = ScaffoldMessenger.maybeOf(
+      context,
+    );
     messenger?.hideCurrentSnackBar();
     messenger?.showSnackBar(
       SnackBar(
@@ -165,7 +298,9 @@ class _LevelPuzzleScreenState extends State<LevelPuzzleScreen> {
                   children: <Widget>[
                     Text(
                       'Need Help?',
-                      style: AppTextStyles.heading2.copyWith(color: AppColors.textPrimary),
+                      style: AppTextStyles.heading2.copyWith(
+                        color: AppColors.textPrimary,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: AppSpacing.xl),
@@ -250,7 +385,9 @@ class _HintOptionButton extends StatelessWidget {
                 const SizedBox(width: AppSpacing.sm),
                 Text(
                   title,
-                  style: AppTextStyles.body.copyWith(color: AppColors.mutedText),
+                  style: AppTextStyles.body.copyWith(
+                    color: AppColors.mutedText,
+                  ),
                 ),
               ],
             ),
@@ -292,11 +429,17 @@ class _PremiumButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Icon(Icons.workspace_premium_outlined, color: AppColors.goldAccent, size: 22),
+            Icon(
+              Icons.workspace_premium_outlined,
+              color: AppColors.goldAccent,
+              size: 22,
+            ),
             const SizedBox(width: AppSpacing.sm),
             Text(
               'Be Premium',
-              style: AppTextStyles.buttonLabel.copyWith(color: AppColors.goldAccent),
+              style: AppTextStyles.buttonLabel.copyWith(
+                color: AppColors.goldAccent,
+              ),
             ),
           ],
         ),
@@ -313,7 +456,10 @@ class _FooterMetaBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm, horizontal: AppSpacing.md),
+      padding: const EdgeInsets.symmetric(
+        vertical: AppSpacing.sm,
+        horizontal: AppSpacing.md,
+      ),
       decoration: BoxDecoration(
         color: AppColors.keypadSurface,
         borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -377,7 +523,6 @@ class AnswerController extends ValueNotifier<String> {
     value = value.substring(0, value.length - 1);
   }
 
-  @override
   void clear() {
     value = '';
   }
