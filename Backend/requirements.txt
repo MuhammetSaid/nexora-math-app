@@ -29,7 +29,11 @@ pytest==8.0.0
 pytest-asyncio==0.23.4
 httpx==0.26.0
 
-# AI/Bot için (opsiyonel - ileride kullanılabilir)
-# numpy==1.26.3
-# scikit-learn==1.4.0
+# AI/Bot için (Opsiyonel - API key yoksa simülasyon modu kullanılır)
+# Not: Langchain paketleri büyük olduğu için opsiyoneldir
+# Eğer bağımlılık çakışması varsa, bu satırları yorum satırı yapabilirsiniz
+# langchain==0.3.7
+# langchain-core==0.3.15
+# langchain-openai==0.2.8
+# openai>=1.12.0
 
