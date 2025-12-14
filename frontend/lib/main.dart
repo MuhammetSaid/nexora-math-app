@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:frontend/l10n/app_localizations.dart';
 
+import 'config/api_config.dart';
 import 'services/auth/auth_controller.dart';
 import 'services/auth/auth_service.dart';
 import 'screens/home/home_screen.dart';
@@ -45,7 +46,9 @@ class _NexoraAppState extends State<NexoraApp> {
   @override
   void initState() {
     super.initState();
-    _authController = AuthController(service: const MockAuthService());
+    _authController = AuthController(
+      service: ApiAuthService(baseUrl: ApiConfig.baseUrl),
+    );
   }
 
   void setLocale(Locale locale) {

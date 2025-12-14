@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/l10n/app_localizations.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../models/user/auth_session.dart';
 import '../../services/auth/auth_controller.dart';
@@ -278,9 +279,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       isLoading: isProcessing && activeKey == 'google',
                       onTap: () => handleAction(
                         'google',
-                        () => auth.signInWithGoogle(
-                          idToken: 'mock-google-id-token', // TODO: replace with Google ID token when wired.
-                        ),
+                        () => _performGoogleSignIn(auth),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.sm),
@@ -299,6 +298,26 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       },
     );
+  }
+
+  Future<AuthSession?> _performGoogleSignIn(AuthController auth) async {
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn(scopes: <String>['email']);
+      final GoogleSignInAccount? account = await googleSignIn.signIn();
+      if (account == null) {
+        return null; // User cancelled.
+      }
+      final GoogleSignInAuthentication authData =
+          await account.authentication;
+      final String? idToken = authData.idToken;
+      if (idToken == null) {
+        throw Exception('Google ID token missing');
+      }
+      return auth.signInWithGoogle(idToken: idToken);
+    } catch (error, stackTrace) {
+      debugPrint('Google sign-in failed: $error\n$stackTrace');
+      return null;
+    }
   }
 
   void _showSignedInSnack(String name) {
