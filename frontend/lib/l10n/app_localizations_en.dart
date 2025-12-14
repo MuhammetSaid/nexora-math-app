@@ -120,4 +120,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get password => 'Password';
+
+  @override
+  String get authChoiceTitle => 'Choose how to start';
+
+  @override
+  String get authChoiceSubtitle =>
+      'Sign in with Google to sync your progress or continue as a guest.';
+
+  @override
+  String get continueAsGuest => 'Continue as guest';
+
+  @override
+  String get continueAsGuestCaption =>
+      'Jump in quickly and keep progress on this device.';
+
+  @override
+  String get signInWithGoogle => 'Sign in with Google';
+
+  @override
+  String get signInWithGoogleCaption =>
+      'Recommended for sync, backups, and leaderboards.';
+
+  @override
+  String get authMaybeLater => 'Maybe later';
+
+  @override
+  String get authFailed => 'Sign-in failed, please try again.';
+
+  @override
+  String authSignedInAs(String name) {
+    return 'Signed in as $name';
+  }
 }

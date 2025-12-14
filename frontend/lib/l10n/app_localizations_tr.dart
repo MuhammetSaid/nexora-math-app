@@ -15,16 +15,16 @@ class AppLocalizationsTr extends AppLocalizations {
   String get homeTitle => 'NEXORA';
 
   @override
-  String get startGame => 'Oyuna Başla';
+  String get startGame => 'Oyuna BaYla';
 
   @override
-  String get chapters => 'Bölümler';
+  String get chapters => 'BÇôlÇ¬mler';
 
   @override
   String get endlessMode => 'Sonsuz Mod';
 
   @override
-  String get comingSoon => 'Yakında';
+  String get comingSoon => 'YakŽñnda';
 
   @override
   String get bottomIq => 'IQ';
@@ -50,40 +50,40 @@ class AppLocalizationsTr extends AppLocalizations {
   String get enter => 'Enter';
 
   @override
-  String get hint => 'İpucu';
+  String get hint => 'Žøpucu';
 
   @override
   String get settings => 'Ayarlar';
 
   @override
-  String get profileSettings => 'Profil Ayarları';
+  String get profileSettings => 'Profil AyarlarŽñ';
 
   @override
-  String get achievements => 'Başarılar';
+  String get achievements => 'BaYarŽñlar';
 
   @override
   String get language => 'Dil';
 
   @override
-  String get soundsOn => 'Ses Açık';
+  String get soundsOn => 'Ses AÇõŽñk';
 
   @override
-  String get soundsOff => 'Ses Kapalı';
+  String get soundsOff => 'Ses KapalŽñ';
 
   @override
   String get deleteData => 'Verileri Sil';
 
   @override
-  String get privacyPolicy => 'Gizlilik Politikası';
+  String get privacyPolicy => 'Gizlilik PolitikasŽñ';
 
   @override
-  String get termsOfService => 'Kullanım Şartları';
+  String get termsOfService => 'KullanŽñm ?artlarŽñ';
 
   @override
-  String get dialogPlaceholder => 'İçerik yakında.';
+  String get dialogPlaceholder => 'ŽøÇõerik yakŽñnda.';
 
   @override
-  String get dailyPuzzle => 'Günlük Soru';
+  String get dailyPuzzle => 'GÇ¬nlÇ¬k Soru';
 
   @override
   String get levelMode => 'Seviyeler';
@@ -107,17 +107,49 @@ class AppLocalizationsTr extends AppLocalizations {
   String get totalLevels => '100 Seviye';
 
   @override
-  String get changeAvatar => 'Avatarı Değiştir';
+  String get changeAvatar => 'AvatarŽñ DeŽYiYtir';
 
   @override
-  String get loginAnotherAccount => 'Başka hesapla giriş yap';
+  String get loginAnotherAccount => 'BaYka hesapla giriY yap';
 
   @override
-  String get name => 'İsim';
+  String get name => 'Žøsim';
 
   @override
   String get email => 'E-posta';
 
   @override
-  String get password => 'Şifre';
+  String get password => '?ifre';
+
+  @override
+  String get authChoiceTitle => 'NasŽñl devam etmek istersin?';
+
+  @override
+  String get authChoiceSubtitle =>
+      'Ž°lerlemeni kaydetmek iÇîn Google ile giriÇ yapabilir ya da misafir olarak devam edebilirsin.';
+
+  @override
+  String get continueAsGuest => 'Misafir olarak devam et';
+
+  @override
+  String get continueAsGuestCaption =>
+      'HŽñzlŽñ baÇla, ilerlemen bu cihazda kalŽñr.';
+
+  @override
+  String get signInWithGoogle => 'Google ile giriÇ yap';
+
+  @override
+  String get signInWithGoogleCaption =>
+      'Bulut yedekleme ve liderlik tablosu iÇîn önerilir.';
+
+  @override
+  String get authMaybeLater => 'Daha sonra';
+
+  @override
+  String get authFailed => 'GiriÇ baÇarŽñsŽz, lütfen tekrar dene.';
+
+  @override
+  String authSignedInAs(String name) {
+    return '$name olarak giriÇ yapŽñldŽñ';
+  }
 }

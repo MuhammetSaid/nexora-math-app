@@ -43,5 +43,21 @@
   "loginAnotherAccount": "Log in with another account",
   "name": "Name",
   "email": "Email",
-  "password": "Password"
+  "password": "Password",
+  "authChoiceTitle": "Choose how to start",
+  "authChoiceSubtitle": "Sign in with Google to sync your progress or continue as a guest.",
+  "continueAsGuest": "Continue as guest",
+  "continueAsGuestCaption": "Jump in quickly and keep progress on this device.",
+  "signInWithGoogle": "Sign in with Google",
+  "signInWithGoogleCaption": "Recommended for sync, backups, and leaderboards.",
+  "authMaybeLater": "Maybe later",
+  "authFailed": "Sign-in failed, please try again.",
+  "authSignedInAs": "Signed in as {name}",
+  "@authSignedInAs": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

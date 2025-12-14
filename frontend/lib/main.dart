@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:frontend/l10n/app_localizations.dart';
 
+import 'services/auth/auth_controller.dart';
+import 'services/auth/auth_service.dart';
 import 'screens/home/home_screen.dart';
 import 'theme/app_theme.dart';
 
@@ -36,11 +38,26 @@ class NexoraApp extends StatefulWidget {
 
 class _NexoraAppState extends State<NexoraApp> {
   Locale? _locale;
+  late final AuthController _authController;
+
+  AuthController get authController => _authController;
+
+  @override
+  void initState() {
+    super.initState();
+    _authController = AuthController(service: const MockAuthService());
+  }
 
   void setLocale(Locale locale) {
     setState(() {
       _locale = locale;
     });
+  }
+
+  @override
+  void dispose() {
+    _authController.dispose();
+    super.dispose();
   }
 
   @override
@@ -76,7 +93,7 @@ class _NexoraAppState extends State<NexoraApp> {
           return supported.first;
         }
       },
-      home: const HomeScreen(),
+      home: HomeScreen(authController: _authController),
     );
   }
 }

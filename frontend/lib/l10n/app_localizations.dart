@@ -319,6 +319,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Password'**
   String get password;
+
+  /// No description provided for @authChoiceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how to start'**
+  String get authChoiceTitle;
+
+  /// No description provided for @authChoiceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Google to sync your progress or continue as a guest.'**
+  String get authChoiceSubtitle;
+
+  /// No description provided for @continueAsGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue as guest'**
+  String get continueAsGuest;
+
+  /// No description provided for @continueAsGuestCaption.
+  ///
+  /// In en, this message translates to:
+  /// **'Jump in quickly and keep progress on this device.'**
+  String get continueAsGuestCaption;
+
+  /// No description provided for @signInWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Google'**
+  String get signInWithGoogle;
+
+  /// No description provided for @signInWithGoogleCaption.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended for sync, backups, and leaderboards.'**
+  String get signInWithGoogleCaption;
+
+  /// No description provided for @authMaybeLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Maybe later'**
+  String get authMaybeLater;
+
+  /// No description provided for @authFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign-in failed, please try again.'**
+  String get authFailed;
+
+  /// No description provided for @authSignedInAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in as {name}'**
+  String authSignedInAs(String name);
 }
 
 class _AppLocalizationsDelegate
