@@ -21,6 +21,7 @@ class AnswerBar extends StatelessWidget {
     required this.hint1,
     required this.hint2,
     required this.solutionExplanation,
+    this.useCustomHandler = false, // Bot oyunu için
   });
 
   final ValueListenable<String> answerListenable;
@@ -36,6 +37,7 @@ class AnswerBar extends StatelessWidget {
   final String hint1;
   final String hint2;
   final String solutionExplanation;
+  final bool useCustomHandler; // true ise onEnter callback'ini çağır
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +81,13 @@ class AnswerBar extends StatelessWidget {
   }
 
   void _handleEnter(BuildContext context) {
+    // Bot oyunu gibi özel durumlar için custom handler kullan
+    if (useCustomHandler) {
+      onEnter(); // Parent'taki handler'ı çağır
+      return;
+    }
+
+    // Normal mod: AnswerBar kendi içinde kontrol eder
     final String userAnswer = answerListenable.value.trim();
     if (userAnswer.isEmpty) {
       return;
