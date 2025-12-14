@@ -1,16 +1,74 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/l10n/app_localizations.dart';
 
+import '../../models/user_profile.dart';
+import '../../services/api/user_service.dart';
+import '../../services/storage/profile_storage.dart';
 import '../../theme/colors.dart';
 import '../../theme/text_styles.dart';
 import '../../utils/constants.dart';
 import '../../widgets/common/glow_button.dart';
+import '../../widgets/auth/login_dialog.dart';
 import '../settings/settings_screen.dart';
 import '../game/game_mode_screen.dart';
 
 /// Single home screen matching the provided dark gold reference.
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  UserProfile? _activeProfile;
+  bool _loginDialogOpen = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _bootstrapProfile();
+  }
+
+  Future<void> _bootstrapProfile() async {
+    final UserProfile? cached = await ProfileStorage.load();
+    if (!mounted) return;
+
+    if (cached != null) {
+      setState(() => _activeProfile = cached);
+      await _refreshProfile(cached.userId);
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _openLoginModal());
+    }
+  }
+
+  Future<void> _refreshProfile(String userId) async {
+    try {
+      final UserProfile? profile = await UserService.fetchProfile(userId);
+      if (profile != null && mounted) {
+        setState(() => _activeProfile = profile);
+        await ProfileStorage.save(profile);
+      }
+    } catch (_) {
+      // Offline or backend unavailable; keep cached profile.
+    }
+  }
+
+  Future<void> _openLoginModal() async {
+    if (!mounted || _loginDialogOpen) return;
+    _loginDialogOpen = true;
+    try {
+      final UserProfile? loggedIn = await showLoginDialog(
+        context,
+        initialEmail: _activeProfile?.email,
+      );
+      if (loggedIn != null && mounted) {
+        setState(() => _activeProfile = loggedIn);
+      }
+    } finally {
+      _loginDialogOpen = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,13 +125,23 @@ class HomeScreen extends StatelessWidget {
                             GlowButton(
                               label: l10n.startGame,
                               height: 68,
-                              onTap: () {
-                                Navigator.of(context).push(
+                              onTap: () async {
+                                if (_activeProfile == null) {
+                                  await _openLoginModal();
+                                }
+                                if (_activeProfile == null || !mounted) return;
+                                final UserProfile? result =
+                                    await Navigator.of(context).push<UserProfile?>(
                                   MaterialPageRoute(
-                                    builder: (context) =>
-                                        const GameModeScreen(),
+                                    builder: (context) => GameModeScreen(
+                                      profile: _activeProfile,
+                                      onProfileUpdated: _handleProfileUpdated,
+                                    ),
                                   ),
                                 );
+                                if (result != null) {
+                                  _handleProfileUpdated(result);
+                                }
                               },
                             ),
                             const SizedBox(height: AppSpacing.xxl + 8),
@@ -124,9 +192,10 @@ class HomeScreen extends StatelessWidget {
                                     );
                                   },
                                 ),
-                                const _BottomMeta(
+                                _BottomMeta(
                                   icon: Icons.account_circle_outlined,
                                   label: 'Session',
+                                  onTap: _openLoginModal,
                                 ),
                               ],
                             ),
@@ -167,6 +236,13 @@ class HomeScreen extends StatelessWidget {
     } catch (error) {
       debugPrint('Unable to show Snackbar: $error');
     }
+  }
+
+  void _handleProfileUpdated(UserProfile profile) {
+    if (!mounted) return;
+    setState(() {
+      _activeProfile = profile;
+    });
   }
 }
 
