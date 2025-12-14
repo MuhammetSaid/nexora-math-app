@@ -7,6 +7,9 @@ import 'question_screen.dart';
 import '../settings/settings_screen.dart';
 import '../../l10n/app_localizations.dart';
 import 'daily_puzzle_screen.dart';
+import 'bot_level_selection_sheet.dart';
+import '../../theme/colors.dart';
+
 class GameModeScreen extends StatelessWidget {
   const GameModeScreen({super.key});
 
@@ -78,6 +81,9 @@ class GameModeScreen extends StatelessWidget {
                           Color(0x4D6B4CE6),
                           Color(0x339B6CE6),
                         ],
+                        onTap: (context) {
+                          _showBotLevelSelection(context);
+                        },
                       ),
                       _buildGameModeCard(
                         icon: Icons.emoji_events_rounded,
@@ -120,20 +126,29 @@ class GameModeScreen extends StatelessWidget {
       child: Container(
         width: double.infinity,
         height: 10,
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.only(
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.only(
             bottomLeft: Radius.circular(30),
             bottomRight: Radius.circular(30),
           ),
           border: Border(
-            left: BorderSide(color: Color(0x26FFFFFF), width: 1.5),
-            right: BorderSide(color: Color(0x26FFFFFF), width: 1.5),
-            bottom: BorderSide(color: Color(0x26FFFFFF), width: 1.5),
+            left: BorderSide(
+              color: AppColors.gold.withOpacity(0.15),
+              width: 1.5,
+            ),
+            right: BorderSide(
+              color: AppColors.gold.withOpacity(0.15),
+              width: 1.5,
+            ),
+            bottom: BorderSide(
+              color: AppColors.gold.withOpacity(0.15),
+              width: 1.5,
+            ),
           ),
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0x14FFFFFF), Color(0x08FFFFFF)],
+            colors: [AppColors.gold.withOpacity(0.08), const Color(0x08FFFFFF)],
           ),
         ),
       ),
@@ -146,11 +161,11 @@ class GameModeScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.white30, width: 2),
-          gradient: const LinearGradient(
+          border: Border.all(color: AppColors.gold.withOpacity(0.3), width: 2),
+          gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0x99C6C6C6), Color(0x66000000)],
+            colors: [AppColors.gold.withOpacity(0.15), const Color(0x66000000)],
           ),
         ),
         child: Row(
@@ -161,7 +176,14 @@ class GameModeScreen extends StatelessWidget {
               height: 60,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xE6363F41), width: 3),
+                border: Border.all(color: AppColors.goldAccent, width: 3),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.goldAccent.withOpacity(0.3),
+                    blurRadius: 8,
+                    spreadRadius: 2,
+                  ),
+                ],
               ),
               child: const ClipOval(
                 child: Icon(Icons.person, color: Colors.white, size: 38),
@@ -230,7 +252,7 @@ class GameModeScreen extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0x33FFFFFF), width: 1),
+            border: Border.all(color: AppColors.gold.withOpacity(0.4), width: 1),
             color: const Color(0x33E5E5E5),
           ),
           child: ClipRRect(
@@ -263,7 +285,7 @@ class GameModeScreen extends StatelessWidget {
                           value: progressValue,
                           backgroundColor: const Color(0x33FFFFFF),
                           valueColor: const AlwaysStoppedAnimation<Color>(
-                            Color(0xFFFF9F43),
+                            AppColors.goldAccent,
                           ),
                           minHeight: 6,
                         ),
@@ -283,11 +305,11 @@ class GameModeScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(17),
-        border: Border.all(color: const Color(0x26FFFFFF), width: 1.5),
-        gradient: const LinearGradient(
+        border: Border.all(color: AppColors.gold.withOpacity(0.2), width: 1.5),
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0x14FFFFFF), Color(0x08FFFFFF)],
+          colors: [AppColors.gold.withOpacity(0.08), const Color(0x08FFFFFF)],
         ),
       ),
       child: Padding(
@@ -330,22 +352,20 @@ class GameModeScreen extends StatelessWidget {
           height: 20,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: isActive ? const Color(0xFFFF9F43) : const Color(0xFF616161),
+            color: isActive ? AppColors.goldAccent : const Color(0xFF616161),
             border: Border.all(
-              color: isActive
-                  ? const Color(0x80FF9F43)
-                  : const Color(0xFF757575),
+              color: isActive ? AppColors.gold : const Color(0xFF757575),
               width: 1.5,
             ),
             boxShadow: isActive
-                ? const [
+                ? [
                     BoxShadow(
-                      color: Color(0x99FF9F43),
+                      color: AppColors.goldAccent.withOpacity(0.6),
                       blurRadius: 12,
                       spreadRadius: 2,
                     ),
                     BoxShadow(
-                      color: Color(0x4DFF9F43),
+                      color: AppColors.gold.withOpacity(0.3),
                       blurRadius: 18,
                       spreadRadius: 4,
                     ),
@@ -405,13 +425,20 @@ class GameModeScreen extends StatelessWidget {
       height: 38,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(2),
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xCCFF9F43), Color(0x99616161)],
+          colors: [
+            AppColors.goldAccent.withOpacity(0.8),
+            const Color(0x99616161),
+          ],
         ),
-        boxShadow: const [
-          BoxShadow(color: Color(0x4DFF9F43), blurRadius: 6, spreadRadius: 1),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.goldAccent.withOpacity(0.3),
+            blurRadius: 6,
+            spreadRadius: 1,
+          ),
         ],
       ),
     );
@@ -430,27 +457,27 @@ class GameModeScreen extends StatelessWidget {
         child: Container(
           width: 110,
           height: 110,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: RadialGradient(
               center: Alignment.topLeft,
               radius: 1.2,
               colors: [
-                Color(0x66FFFFFF),
-                Color(0x33FFFFFF),
-                Color(0x1AFFFFFF),
-                Color(0x00FFFFFF),
+                AppColors.goldSoft.withOpacity(0.4),
+                AppColors.gold.withOpacity(0.2),
+                AppColors.goldAccent.withOpacity(0.1),
+                Colors.transparent,
               ],
-              stops: [0.0, 0.3, 0.6, 1.0],
+              stops: const [0.0, 0.3, 0.6, 1.0],
             ),
             boxShadow: [
               BoxShadow(
-                color: Color(0x4DFFFFFF),
+                color: AppColors.goldAccent.withOpacity(0.3),
                 blurRadius: 30,
                 spreadRadius: 6,
               ),
               BoxShadow(
-                color: Color(0x33FFFFFF),
+                color: AppColors.gold.withOpacity(0.2),
                 blurRadius: 45,
                 spreadRadius: 10,
               ),
@@ -459,13 +486,20 @@ class GameModeScreen extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: const Color(0x66FFFFFF), width: 2),
-              color: const Color(0xB3FFFFFF),
+              border: Border.all(
+                color: AppColors.gold.withOpacity(0.4),
+                width: 2,
+              ),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.goldSoft, AppColors.gold],
+              ),
             ),
             child: const Center(
               child: Icon(
                 Icons.play_arrow_rounded,
-                color: Color(0xBF1E1E1E),
+                color: Color(0xFF1E1E1E),
                 size: 63,
               ),
             ),
@@ -480,11 +514,11 @@ class GameModeScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0x33FFFFFF), width: 1),
-        gradient: const LinearGradient(
+        border: Border.all(color: AppColors.gold.withOpacity(0.2), width: 1),
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0x1AFFFFFF), Color(0x0DFFFFFF)],
+          colors: [AppColors.gold.withOpacity(0.08), const Color(0x0DFFFFFF)],
         ),
       ),
       child: Row(
@@ -512,14 +546,26 @@ class GameModeScreen extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: const Color(0xCCFFFFFF), size: 28),
+          Icon(icon, color: AppColors.goldSoft, size: 28),
           const SizedBox(height: 4),
           Text(
             label,
-            style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 12),
+            style: TextStyle(
+              color: AppColors.goldSoft.withOpacity(0.8),
+              fontSize: 12,
+            ),
           ),
         ],
       ),
+    );
+  }
+
+  void _showBotLevelSelection(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => const BotLevelSelectionSheet(),
     );
   }
 }
