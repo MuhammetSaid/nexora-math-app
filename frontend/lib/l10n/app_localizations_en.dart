@@ -65,6 +65,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginAnotherAccount => 'Log in with another account';
 
   @override
+  String get loginTitle => 'Sign in';
+
+  @override
+  String get loginSubtitle => 'Enter your email and password to continue.';
+
+  @override
+  String get loginButton => 'Sign in';
+
+  @override
+  String get loginCancel => 'Close';
+
+  @override
+  String get loginInvalid => 'Email or password is incorrect';
+
+  @override
+  String get loginFailed => 'Login failed, please try again';
+
+  @override
   String get profileName => 'Name';
 
   @override

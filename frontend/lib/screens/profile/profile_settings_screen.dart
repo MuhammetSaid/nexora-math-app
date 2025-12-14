@@ -7,10 +7,13 @@ import '../../services/storage/profile_storage.dart';
 import '../../theme/colors.dart';
 import '../../theme/text_styles.dart';
 import '../../utils/constants.dart';
+import '../../widgets/auth/login_dialog.dart';
 import '../../widgets/game/nexora_background.dart';
 
 class ProfileSettingsScreen extends StatefulWidget {
-  const ProfileSettingsScreen({super.key});
+  const ProfileSettingsScreen({super.key, this.onProfileChanged});
+
+  final ValueChanged<UserProfile>? onProfileChanged;
 
   @override
   State<ProfileSettingsScreen> createState() => _ProfileSettingsScreenState();
@@ -135,6 +138,19 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
     _showSnack(l10n.clearedProfile);
   }
 
+  Future<void> _loginAnotherAccount(AppLocalizations l10n) async {
+    final UserProfile? loggedIn = await showLoginDialog(
+      context,
+      initialEmail: _emailController.text,
+    );
+    if (loggedIn != null && mounted) {
+      await ProfileStorage.save(loggedIn);
+      widget.onProfileChanged?.call(loggedIn);
+      if (!mounted) return;
+      Navigator.of(context).maybePop(loggedIn);
+    }
+  }
+
   void _showSnack(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -257,7 +273,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                     _ProfileActionButton(
                       icon: Icons.switch_account_outlined,
                       label: l10n.loginAnotherAccount,
-                      onTap: () => _clearProfile(l10n),
+                      onTap: () => _loginAnotherAccount(l10n),
                     ),
                     const SizedBox(height: AppSpacing.md),
                     _ProfileInputField(

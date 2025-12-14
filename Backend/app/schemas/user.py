@@ -31,12 +31,25 @@ class UserCreate(UserBase):
         return value
 
 
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, value: str) -> str:
+        if not value:
+            raise ValueError("password is required")
+        return value
+
+
 class UserUpdate(BaseModel):
     username: Optional[str] = None
     email: Optional[EmailStr] = None
     password: Optional[str] = None
     locale: Optional[str] = None
     country: Optional[str] = None
+    level: Optional[int] = None
 
 
 class UserResponse(BaseModel):

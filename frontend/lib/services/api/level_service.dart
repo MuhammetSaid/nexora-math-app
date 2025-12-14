@@ -1,45 +1,57 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:http/http.dart' as http;
 
 class LevelService {
   // Backend URL - Platform'a göre otomatik
   static String get baseUrl {
     if (Platform.isAndroid) {
-      // Android emulator için özel IP
       return 'http://10.0.2.2:8000/api/v1';
-    } else {
-      // iOS simulator, web, desktop için localhost
-      return 'http://localhost:8000/api/v1';
     }
+    return 'http://localhost:8000/api/v1';
   }
 
-  /// Level bilgisini backend'den çeker
+  /// Tüm aktif levelleri backend'den çeker
+  static Future<List<Map<String, dynamic>>> getLevels() async {
+    final Uri url = Uri.parse('$baseUrl/levels');
+    final http.Response response = await http.get(
+      url,
+      headers: <String, String>{'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data =
+          json.decode(response.body) as List<dynamic>;
+      return data
+          .whereType<Map<String, dynamic>>()
+          .map((Map<String, dynamic> item) => item)
+          .toList();
+    }
+
+    throw HttpException(
+      'Failed to fetch levels (${response.statusCode})',
+      uri: url,
+    );
+  }
+
+  /// Belirli level bilgisini backend'den çeker
   static Future<Map<String, dynamic>?> getLevel(int levelNumber) async {
     try {
-      final url = Uri.parse('$baseUrl/levels/$levelNumber');
-
-      print(' API İsteği: $url');
-
-      final response = await http.get(
+      final Uri url = Uri.parse('$baseUrl/levels/$levelNumber');
+      final http.Response response = await http.get(
         url,
-        headers: {'Content-Type': 'application/json'},
+        headers: <String, String>{'Content-Type': 'application/json'},
       );
 
-      print(' Response Status: ${response.statusCode}');
-      print(' Response Body: ${response.body}');
-
       if (response.statusCode == 200) {
-        final data = json.decode(response.body) as Map<String, dynamic>;
-        print(' Level verisi başarıyla alındı!');
+        final Map<String, dynamic> data =
+            json.decode(response.body) as Map<String, dynamic>;
         return data;
       } else {
-        print(' Hata: ${response.statusCode}');
-        print(' Mesaj: ${response.body}');
         return null;
       }
-    } catch (e) {
-      print(' API Hatası: $e');
+    } catch (_) {
       return null;
     }
   }

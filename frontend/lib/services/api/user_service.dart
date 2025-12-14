@@ -64,12 +64,14 @@ class UserService {
     String? name,
     String? email,
     String? password,
+    int? level,
   }) async {
     final Uri url = Uri.parse('$baseUrl/users/$userId');
     final Map<String, dynamic> body = <String, dynamic>{};
     if (name != null && name.isNotEmpty) body['username'] = name;
     if (email != null && email.isNotEmpty) body['email'] = email;
     if (password != null && password.isNotEmpty) body['password'] = password;
+    if (level != null) body['level'] = level;
 
     final http.Response response = await http.put(
       url,

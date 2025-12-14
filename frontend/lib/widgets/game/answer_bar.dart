@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 import '../../theme/colors.dart';
 import '../../theme/text_styles.dart';
@@ -13,6 +13,7 @@ class AnswerBar extends StatelessWidget {
     required this.onClearAll,
     required this.onHint,
     required this.onEnter,
+    this.onCorrect,
     required this.answerLabel,
     required this.enterLabel,
     required this.hintLabel,
@@ -27,6 +28,7 @@ class AnswerBar extends StatelessWidget {
   final VoidCallback onClearAll;
   final VoidCallback onHint;
   final VoidCallback onEnter;
+  final VoidCallback? onCorrect;
   final String answerLabel;
   final String enterLabel;
   final String hintLabel;
@@ -78,19 +80,15 @@ class AnswerBar extends StatelessWidget {
 
   void _handleEnter(BuildContext context) {
     final String userAnswer = answerListenable.value.trim();
-
-    // Cevap boşsa hiçbir şey yapma
     if (userAnswer.isEmpty) {
       return;
     }
+    onEnter();
 
-    // Cevabı kontrol et
     final String correctAnswer = answer.toString().trim();
     if (userAnswer == correctAnswer) {
-      // Doğru cevap!
       _showSuccessDialog(context);
     } else {
-      // Yanlış cevap
       _showErrorDialog(context);
     }
   }
@@ -121,7 +119,6 @@ class AnswerBar extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                // Başarı ikonu
                 Container(
                   width: 80,
                   height: 80,
@@ -158,6 +155,7 @@ class AnswerBar extends StatelessWidget {
                   onPressed: () {
                     Navigator.of(context).pop();
                     onClearAll();
+                    onCorrect?.call();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.goldAccent,

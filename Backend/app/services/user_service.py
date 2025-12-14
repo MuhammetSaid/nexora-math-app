@@ -1,9 +1,11 @@
 """
 User service helpers
 """
+from datetime import datetime, timezone
 from typing import Optional
 from uuid import uuid4
 import hashlib
+import hmac
 import secrets
 from sqlalchemy.orm import Session
 
@@ -15,6 +17,18 @@ def get_password_hash(password: str) -> str:
     salt = secrets.token_hex(16)
     digest = hashlib.sha256(f"{salt}{password}".encode("utf-8")).hexdigest()
     return f"{salt}${digest}"
+
+
+def verify_password(password: str, stored_hash: str) -> bool:
+    """
+    Verify a plaintext password against a stored salted hash.
+    """
+    try:
+        salt, digest = stored_hash.split("$", 1)
+    except ValueError:
+        return False
+    candidate = hashlib.sha256(f"{salt}{password}".encode("utf-8")).hexdigest()
+    return hmac.compare_digest(candidate, digest)
 
 
 def get_user_by_user_id(db: Session, user_id: str) -> Optional[User]:
@@ -48,6 +62,24 @@ def create_user(db: Session, payload: UserCreate) -> User:
     return user
 
 
+def authenticate_user(db: Session, email: str, password: str) -> Optional[User]:
+    user = get_user_by_email(db, email)
+    if not user:
+        return None
+
+    if not verify_password(password, user.password):
+        return None
+
+    return user
+
+
+def touch_last_login(db: Session, user: User) -> User:
+    user.last_login_at = datetime.now(timezone.utc)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
 def update_user(db: Session, db_user: User, payload: UserUpdate) -> User:
     if payload.username is not None:
         db_user.username = payload.username
@@ -59,6 +91,8 @@ def update_user(db: Session, db_user: User, payload: UserUpdate) -> User:
         db_user.locale = payload.locale
     if payload.country is not None:
         db_user.country = payload.country
+    if payload.level is not None:
+        db_user.level = payload.level
 
     db.commit()
     db.refresh(db_user)

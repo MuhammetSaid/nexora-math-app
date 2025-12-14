@@ -206,6 +206,42 @@ abstract class AppLocalizations {
   /// **'Log in with another account'**
   String get loginAnotherAccount;
 
+  /// No description provided for @loginTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get loginTitle;
+
+  /// No description provided for @loginSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email and password to continue.'**
+  String get loginSubtitle;
+
+  /// No description provided for @loginButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get loginButton;
+
+  /// No description provided for @loginCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get loginCancel;
+
+  /// No description provided for @loginInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Email or password is incorrect'**
+  String get loginInvalid;
+
+  /// No description provided for @loginFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Login failed, please try again'**
+  String get loginFailed;
+
   /// No description provided for @profileName.
   ///
   /// In en, this message translates to:

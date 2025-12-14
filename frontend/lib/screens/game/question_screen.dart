@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/game/puzzle.dart';
-import '../../services/game/puzzle_repository.dart';
+import '../../models/user_profile.dart';
 import '../../services/api/level_service.dart';
+import '../../services/api/user_service.dart';
+import '../../services/game/puzzle_repository.dart';
+import '../../services/storage/profile_storage.dart';
 import '../../theme/colors.dart';
 import '../../theme/text_styles.dart';
 import '../../utils/constants.dart';
@@ -16,9 +19,16 @@ import '../profile/profile_settings_screen.dart';
 import '../settings/settings_screen.dart';
 
 class LevelPuzzleScreen extends StatefulWidget {
-  const LevelPuzzleScreen({super.key, required this.level});
+  const LevelPuzzleScreen({
+    super.key,
+    required this.level,
+    this.profile,
+    this.onProfileUpdated,
+  });
 
   final int level;
+  final UserProfile? profile;
+  final ValueChanged<UserProfile>? onProfileUpdated;
 
   @override
   State<LevelPuzzleScreen> createState() => _LevelPuzzleScreenState();
@@ -26,23 +36,22 @@ class LevelPuzzleScreen extends StatefulWidget {
 
 class _LevelPuzzleScreenState extends State<LevelPuzzleScreen> {
   late final PuzzleRepository _repository;
-  late final Future<Puzzle> _puzzleFuture;
+  late Future<Puzzle> _puzzleFuture;
   final AnswerController _answer = AnswerController();
-  Map<String, dynamic>? _levelData; // Backend'den gelen level verisi
-  bool _isLoadingLevel = true; // Backend'den veri yükleniyor mu?
-  bool _hasError = false; // Hata oluştu mu?
+  Map<String, dynamic>? _levelData;
+  bool _isLoadingLevel = true;
+  bool _hasError = false;
+  UserProfile? _activeProfile;
 
   @override
   void initState() {
     super.initState();
     _repository = const MockPuzzleRepository();
     _puzzleFuture = _repository.fetchLevel(widget.level);
-
-    // Backend'den level bilgisini çek
+    _activeProfile = widget.profile;
     _fetchLevelFromBackend();
   }
 
-  /// Backend'den level bilgisini çeker ve konsola yazdırır
   Future<void> _fetchLevelFromBackend() async {
     setState(() {
       _isLoadingLevel = true;
@@ -50,8 +59,10 @@ class _LevelPuzzleScreenState extends State<LevelPuzzleScreen> {
     });
 
     try {
-      final levelData = await LevelService.getLevel(widget.level);
+      final Map<String, dynamic>? levelData =
+          await LevelService.getLevel(widget.level);
 
+      if (!mounted) return;
       if (levelData != null) {
         setState(() {
           _levelData = levelData;
@@ -62,14 +73,13 @@ class _LevelPuzzleScreenState extends State<LevelPuzzleScreen> {
           _isLoadingLevel = false;
           _hasError = true;
         });
-        print('Level bilgisi alınamadı!');
       }
-    } catch (e) {
+    } catch (_) {
+      if (!mounted) return;
       setState(() {
         _isLoadingLevel = false;
         _hasError = true;
       });
-      print('Hata oluştu: $e');
     }
   }
 
@@ -77,6 +87,35 @@ class _LevelPuzzleScreenState extends State<LevelPuzzleScreen> {
   void dispose() {
     _answer.dispose();
     super.dispose();
+  }
+
+  Future<void> _goToNextLevel() async {
+    final int nextLevel = widget.level + 1;
+    UserProfile? updatedProfile = _activeProfile;
+
+    if (_activeProfile != null && nextLevel > _activeProfile!.level) {
+      try {
+        updatedProfile = await UserService.updateProfile(
+          userId: _activeProfile!.userId,
+          level: nextLevel,
+        );
+        await ProfileStorage.save(updatedProfile);
+        _handleProfileUpdated(updatedProfile);
+      } catch (_) {
+        // backend unreachable; continue without updating cached profile
+      }
+    }
+
+    if (!mounted) return;
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => LevelPuzzleScreen(
+          level: nextLevel,
+          profile: updatedProfile,
+          onProfileUpdated: widget.onProfileUpdated,
+        ),
+      ),
+    );
   }
 
   @override
@@ -103,29 +142,24 @@ class _LevelPuzzleScreenState extends State<LevelPuzzleScreen> {
                       FutureBuilder<Puzzle>(
                         future: _puzzleFuture,
                         builder:
-                            (
-                              BuildContext context,
-                              AsyncSnapshot<Puzzle> snapshot,
-                            ) {
-                              final Puzzle puzzle =
-                                  snapshot.data ??
-                                  Puzzle(
-                                    level: widget.level,
-                                    lines: const <String>[
-                                      '5, 3 = 28',
-                                      '7, 6 = 55',
-                                      '4, 5 = 21',
-                                      '3, 8 = ?',
-                                    ],
-                                  );
-                              return PuzzleCard(
-                                lines: puzzle.lines,
-                                imagePath: _levelData?['image_path'] ?? '',
+                            (BuildContext context, AsyncSnapshot<Puzzle> snapshot) {
+                          final Puzzle puzzle = snapshot.data ??
+                              Puzzle(
                                 level: widget.level,
+                                lines: const <String>[
+                                  '5, 3 = 28',
+                                  '7, 6 = 55',
+                                  '4, 5 = 21',
+                                  '3, 8 = ?',
+                                ],
                               );
-                            },
+                          return PuzzleCard(
+                            lines: puzzle.lines,
+                            imagePath: _levelData?['image_path'] ?? '',
+                            level: widget.level,
+                          );
+                        },
                       ),
-                      // Loading overlay
                       if (_isLoadingLevel)
                         Container(
                           decoration: BoxDecoration(
@@ -152,7 +186,6 @@ class _LevelPuzzleScreenState extends State<LevelPuzzleScreen> {
                             ),
                           ),
                         ),
-                      // Hata durumu
                       if (_hasError && !_isLoadingLevel)
                         Container(
                           decoration: BoxDecoration(
@@ -212,7 +245,8 @@ class _LevelPuzzleScreenState extends State<LevelPuzzleScreen> {
                   onClearLast: _answer.removeLast,
                   onClearAll: _answer.clear,
                   onHint: () => _showHintDialog(context),
-                  onEnter: () => _showSoonSnack(context, l10n),
+                  onEnter: () {},
+                  onCorrect: _goToNextLevel,
                   answerLabel: l10n.answerLabel,
                   enterLabel: l10n.enter,
                   hintLabel: l10n.hint,
@@ -233,14 +267,7 @@ class _LevelPuzzleScreenState extends State<LevelPuzzleScreen> {
                 ),
                 const SizedBox(height: AppSpacing.md),
                 _FooterMetaBar(
-                  onProfileTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute<void>(
-                        builder: (_) => const ProfileSettingsScreen(),
-                      ),
-                    );
-                  },
+                  onProfileTap: _openProfile,
                   onSettingsTap: () {
                     Navigator.push(
                       context,
@@ -258,19 +285,25 @@ class _LevelPuzzleScreenState extends State<LevelPuzzleScreen> {
     );
   }
 
-  void _showSoonSnack(BuildContext context, AppLocalizations l10n) {
-    final ScaffoldMessengerState? messenger = ScaffoldMessenger.maybeOf(
+  Future<void> _openProfile() async {
+    final UserProfile? result = await Navigator.push<UserProfile?>(
       context,
-    );
-    messenger?.hideCurrentSnackBar();
-    messenger?.showSnackBar(
-      SnackBar(
-        content: Text(l10n.comingSoon),
-        backgroundColor: AppColors.panel,
-        duration: AppDurations.medium,
-        behavior: SnackBarBehavior.floating,
+      MaterialPageRoute<UserProfile?>(
+        builder: (_) => ProfileSettingsScreen(
+          onProfileChanged: _handleProfileUpdated,
+        ),
       ),
     );
+    if (result != null) {
+      _handleProfileUpdated(result);
+    }
+  }
+
+  void _handleProfileUpdated(UserProfile profile) {
+    setState(() {
+      _activeProfile = profile;
+    });
+    widget.onProfileUpdated?.call(profile);
   }
 
   void _showHintDialog(BuildContext context) {

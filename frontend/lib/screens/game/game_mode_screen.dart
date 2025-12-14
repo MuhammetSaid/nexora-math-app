@@ -1,113 +1,145 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-import '../levels/levels_screen.dart';
-import 'question_screen.dart';
-import '../settings/settings_screen.dart';
 import '../../l10n/app_localizations.dart';
-import 'daily_puzzle_screen.dart';
+import '../../models/user_profile.dart';
+import '../levels/levels_screen.dart';
 import '../profile/profile_settings_screen.dart';
-class GameModeScreen extends StatelessWidget {
-  const GameModeScreen({super.key});
+import '../settings/settings_screen.dart';
+import 'daily_puzzle_screen.dart';
+import 'question_screen.dart';
+
+class GameModeScreen extends StatefulWidget {
+  const GameModeScreen({super.key, this.profile, this.onProfileUpdated});
+
+  final UserProfile? profile;
+  final ValueChanged<UserProfile>? onProfileUpdated;
+
+  @override
+  State<GameModeScreen> createState() => _GameModeScreenState();
+}
+
+class _GameModeScreenState extends State<GameModeScreen> {
+  UserProfile? _profile;
+
+  @override
+  void initState() {
+    super.initState();
+    _profile = widget.profile;
+  }
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    const int currentLevel = 15;
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(color: Color(0xFF1e1e1e)),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              children: [
-                // Kullanıcı Profil Kartı
-                _buildProfileCard(context),
-                const SizedBox(height: 50),
+    final int currentLevel = _profile?.level ?? 1;
 
-                // Oyun Modları Grid (2x2)
-                Expanded(
-                  flex: 2,
-                  child: GridView.count(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
-                    childAspectRatio: 1.4,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: [
-                      _buildGameModeCard(
-                        icon: Icons.layers_rounded,
-                        title: l10n.levelMode,
-                        subtitle: l10n.play,
-                        showProgress: true,
-                        progressValue: 0.6,
-                        gradientColors: const [
-                          Color(0x4D6B4CE6),
-                          Color(0x339B6CE6),
-                        ],
-                        onTap: (context) {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const LevelsScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      _buildGameModeCard(
-                        icon: Icons.calendar_month_rounded,
-                        title: l10n.dailyPuzzle,
-                        subtitle: l10n.quiz,
-                        gradientColors: const [
-                          Color(0x4D6B4CE6),
-                          Color(0x339B6CE6),
-                        ],
-                        onTap: (context) {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const DailyPuzzleScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      _buildGameModeCard(
-                        icon: Icons.smart_toy_rounded,
-                        title: l10n.botPlay,
-                        subtitle: l10n.play,
-                        gradientColors: const [
-                          Color(0x4D6B4CE6),
-                          Color(0x339B6CE6),
-                        ],
-                      ),
-                      _buildGameModeCard(
-                        icon: Icons.emoji_events_rounded,
-                        title: l10n.tournament,
-                        subtitle: l10n.play,
-                        gradientColors: const [
-                          Color(0x4D6B4CE6),
-                          Color(0x339B6CE6),
-                        ],
-                      ),
-                    ],
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.of(context).pop(_profile);
+        return false;
+      },
+      child: Scaffold(
+        body: Container(
+          decoration: const BoxDecoration(color: Color(0xFF1e1e1e)),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                children: [
+                  _buildProfileCard(context, _profile),
+                  const SizedBox(height: 50),
+
+                  // Oyun Modları Grid (2x2)
+                  Expanded(
+                    flex: 2,
+                    child: GridView.count(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 16,
+                      crossAxisSpacing: 16,
+                      childAspectRatio: 1.4,
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [
+                        _buildGameModeCard(
+                          icon: Icons.layers_rounded,
+                          title: l10n.levelMode,
+                          subtitle: l10n.play,
+                          showProgress: true,
+                          progressValue: 0.6,
+                          gradientColors: const [
+                            Color(0x4D6B4CE6),
+                            Color(0x339B6CE6),
+                          ],
+                          onTap: (context) async {
+                            final UserProfile? updated =
+                                await Navigator.of(context).push<UserProfile?>(
+                              MaterialPageRoute(
+                                builder: (context) => LevelsScreen(
+                                  profile: _profile,
+                                  onProfileUpdated: _handleProfileUpdated,
+                                ),
+                              ),
+                            );
+                            if (updated != null) {
+                              _handleProfileUpdated(updated);
+                            }
+                          },
+                        ),
+                        _buildGameModeCard(
+                          icon: Icons.calendar_month_rounded,
+                          title: l10n.dailyPuzzle,
+                          subtitle: l10n.quiz,
+                          gradientColors: const [
+                            Color(0x4D6B4CE6),
+                            Color(0x339B6CE6),
+                          ],
+                          onTap: (context) {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const DailyPuzzleScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        _buildGameModeCard(
+                          icon: Icons.smart_toy_rounded,
+                          title: l10n.botPlay,
+                          subtitle: l10n.play,
+                          gradientColors: const [
+                            Color(0x4D6B4CE6),
+                            Color(0x339B6CE6),
+                          ],
+                        ),
+                        _buildGameModeCard(
+                          icon: Icons.emoji_events_rounded,
+                          title: l10n.tournament,
+                          subtitle: l10n.play,
+                          gradientColors: const [
+                            Color(0x4D6B4CE6),
+                            Color(0x339B6CE6),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
 
-                const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-                // Seviye Progress Kartı
-                SizedBox(
-                  height: 265,
-                  child: _buildLevelProgressCard(context, currentLevel),
-                ),
-                _deneme(pad: 14),
-                _deneme(pad: 22),
+                  // Seviye Progress Kartı
+                  SizedBox(
+                    height: 265,
+                    child: _buildLevelProgressCard(context, currentLevel),
+                  ),
+                  _deneme(pad: 14),
+                  _deneme(pad: 22),
 
-                const SizedBox(height: 15),
+                  const SizedBox(height: 15),
 
-                // Alt Navigasyon
-                _buildBottomNavigation(context),
-              ],
+                  // Alt Navigasyon
+                  _buildBottomNavigation(context),
+                ],
+              ),
             ),
           ),
         ),
@@ -141,7 +173,12 @@ class GameModeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileCard(BuildContext context) {
+  Widget _buildProfileCard(BuildContext context, UserProfile? user) {
+    final String displayName =
+        (user?.name.isNotEmpty ?? false) ? user!.name : 'Guest';
+    final String diamondText =
+        NumberFormat.decimalPattern().format(user?.diamond ?? 0);
+
     return RepaintBoundary(
       child: GestureDetector(
         onTap: () => _openProfile(context),
@@ -158,7 +195,6 @@ class GameModeScreen extends StatelessWidget {
           ),
           child: Row(
             children: [
-              // Profil Resmi
               Container(
                 width: 60,
                 height: 60,
@@ -171,21 +207,18 @@ class GameModeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 10),
-
-              // İsim
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'John Doe',
-                  style: TextStyle(
+                  displayName,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.5,
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-
-              // IQ Puanı
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Row(
@@ -200,9 +233,9 @@ class GameModeScreen extends StatelessWidget {
                       cacheHeight: 54,
                     ),
                     const SizedBox(width: 7),
-                    const Text(
-                      '3,450',
-                      style: TextStyle(
+                    Text(
+                      diamondText,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -228,6 +261,9 @@ class GameModeScreen extends StatelessWidget {
     required List<Color> gradientColors,
     Function(BuildContext)? onTap,
   }) {
+    final String subtitleText =
+        subtitle == null ? title : '$title $subtitle';
+
     return Builder(
       builder: (context) => GestureDetector(
         onTap: onTap != null ? () => onTap(context) : null,
@@ -250,7 +286,7 @@ class GameModeScreen extends StatelessWidget {
                     Icon(icon, color: Colors.white, size: 36),
                     const Spacer(),
                     Text(
-                      '$title $subtitle',
+                      subtitleText,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -258,7 +294,6 @@ class GameModeScreen extends StatelessWidget {
                         letterSpacing: 1,
                       ),
                     ),
-
                     if (showProgress) ...[
                       const SizedBox(height: 12),
                       ClipRRect(
@@ -298,23 +333,27 @@ class GameModeScreen extends StatelessWidget {
         padding: const EdgeInsets.all(22),
         child: Row(
           children: [
-            // Sol taraf - Progress Timeline
             Expanded(
               flex: 3,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildLevelIndicator('Level 15', true, isResume: true),
+                  _buildLevelIndicator(
+                    'Level $currentLevel',
+                    true,
+                    subtitle: 'Resume Level $currentLevel',
+                  ),
                   _buildProgressLine(),
-                  _buildLevelIndicator('Level 16', false),
+                  _buildLevelIndicator(
+                    'Level ${currentLevel + 1}',
+                    false,
+                    subtitle: 'Chapter: Calculus Basics',
+                  ),
                 ],
               ),
             ),
-
             const SizedBox(width: 16),
-
-            // Sağ taraf - Play Orb
             Expanded(flex: 2, child: _buildPlayOrb(context, currentLevel)),
           ],
         ),
@@ -325,7 +364,7 @@ class GameModeScreen extends StatelessWidget {
   Widget _buildLevelIndicator(
     String level,
     bool isActive, {
-    bool isResume = false,
+    String? subtitle,
   }) {
     return Row(
       children: [
@@ -371,25 +410,15 @@ class GameModeScreen extends StatelessWidget {
                   letterSpacing: 0.5,
                 ),
               ),
-              if (isResume)
-                const Padding(
-                  padding: EdgeInsets.only(top: 2),
+              if (subtitle != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
                   child: Text(
-                    'Resume Level 42',
+                    subtitle,
                     style: TextStyle(
-                      color: Color(0xFFBDBDBD),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-              if (!isActive)
-                const Padding(
-                  padding: EdgeInsets.only(top: 2),
-                  child: Text(
-                    'Chapter: Calculus Basics',
-                    style: TextStyle(
-                      color: Color(0xFF9E9E9E),
+                      color: isActive
+                          ? const Color(0xFFBDBDBD)
+                          : const Color(0xFF9E9E9E),
                       fontSize: 11,
                       fontWeight: FontWeight.w400,
                     ),
@@ -427,7 +456,11 @@ class GameModeScreen extends StatelessWidget {
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => LevelPuzzleScreen(level: currentLevel),
+              builder: (context) => LevelPuzzleScreen(
+                level: currentLevel,
+                profile: _profile,
+                onProfileUpdated: _handleProfileUpdated,
+              ),
             ),
           );
         },
@@ -480,11 +513,19 @@ class GameModeScreen extends StatelessWidget {
   }
 
   void _openProfile(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (context) => const ProfileSettingsScreen(),
+    Navigator.of(context)
+        .push<UserProfile?>(
+      MaterialPageRoute<UserProfile?>(
+        builder: (context) => ProfileSettingsScreen(
+          onProfileChanged: _handleProfileUpdated,
+        ),
       ),
-    );
+    )
+        .then((UserProfile? value) {
+      if (value != null) {
+        _handleProfileUpdated(value);
+      }
+    });
   }
 
   Widget _buildBottomNavigation(BuildContext context) {
@@ -537,5 +578,12 @@ class GameModeScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _handleProfileUpdated(UserProfile profile) {
+    setState(() {
+      _profile = profile;
+    });
+    widget.onProfileUpdated?.call(profile);
   }
 }

@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
-from app.schemas.user import UserCreate, UserResponse, UserUpdate
+from app.schemas.user import UserCreate, UserLogin, UserResponse, UserUpdate
 from app.services import user_service
 
 router = APIRouter()
@@ -52,3 +52,15 @@ def update_user_profile(
             )
 
     return user_service.update_user(db, user, payload)
+
+
+@router.post("/auth/login", response_model=UserResponse)
+def login(payload: UserLogin, db: Session = Depends(get_db)):
+    user = user_service.authenticate_user(db, payload.email, payload.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+        )
+
+    return user_service.touch_last_login(db, user)
