@@ -74,6 +74,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profilePassword => 'Password';
 
   @override
+  String get passwordOptional => 'Leave blank to keep current password';
+
+  @override
+  String get saveProfile => 'Save Profile';
+
+  @override
+  String get profileSaved => 'Profile saved';
+
+  @override
+  String get profileSaveFailed => 'Could not save profile';
+
+  @override
+  String get clearedProfile => 'Profile cache cleared';
+
+  @override
+  String get nameRequired => 'Name is required';
+
+  @override
+  String get emailRequired => 'Email is required';
+
+  @override
+  String get invalidEmail => 'Enter a valid email';
+
+  @override
+  String get passwordRequired => 'Password is required';
+
+  @override
   String get achievements => 'Achievements';
 
   @override

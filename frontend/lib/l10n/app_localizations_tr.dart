@@ -74,6 +74,33 @@ class AppLocalizationsTr extends AppLocalizations {
   String get profilePassword => 'Şifre';
 
   @override
+  String get passwordOptional => 'Mevcut şifreyi korumak için boş bırak';
+
+  @override
+  String get saveProfile => 'Profili Kaydet';
+
+  @override
+  String get profileSaved => 'Profil kaydedildi';
+
+  @override
+  String get profileSaveFailed => 'Profil kaydedilemedi';
+
+  @override
+  String get clearedProfile => 'Profil önbelleği temizlendi';
+
+  @override
+  String get nameRequired => 'İsim gerekli';
+
+  @override
+  String get emailRequired => 'E-posta gerekli';
+
+  @override
+  String get invalidEmail => 'Geçerli bir e-posta girin';
+
+  @override
+  String get passwordRequired => 'Şifre gerekli';
+
+  @override
   String get achievements => 'Başarılar';
 
   @override

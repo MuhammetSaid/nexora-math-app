@@ -224,6 +224,60 @@ abstract class AppLocalizations {
   /// **'Password'**
   String get profilePassword;
 
+  /// No description provided for @passwordOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave blank to keep current password'**
+  String get passwordOptional;
+
+  /// No description provided for @saveProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Profile'**
+  String get saveProfile;
+
+  /// No description provided for @profileSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile saved'**
+  String get profileSaved;
+
+  /// No description provided for @profileSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save profile'**
+  String get profileSaveFailed;
+
+  /// No description provided for @clearedProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile cache cleared'**
+  String get clearedProfile;
+
+  /// No description provided for @nameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Name is required'**
+  String get nameRequired;
+
+  /// No description provided for @emailRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Email is required'**
+  String get emailRequired;
+
+  /// No description provided for @invalidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email'**
+  String get invalidEmail;
+
+  /// No description provided for @passwordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is required'**
+  String get passwordRequired;
+
   /// No description provided for @achievements.
   ///
   /// In en, this message translates to:
