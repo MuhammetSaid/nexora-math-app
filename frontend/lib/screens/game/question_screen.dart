@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
@@ -251,10 +253,6 @@ class _LevelPuzzleScreenState extends State<LevelPuzzleScreen> {
                   enterLabel: l10n.enter,
                   hintLabel: l10n.hint,
                   answer: _levelData?['answer_value']?.toString() ?? '',
-                  hint1: _levelData?['hint1']?.toString() ?? '',
-                  hint2: _levelData?['hint2']?.toString() ?? '',
-                  solutionExplanation:
-                      _levelData?['solution_explanation']?.toString() ?? '',
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 NumericKeypad(
@@ -307,6 +305,18 @@ class _LevelPuzzleScreenState extends State<LevelPuzzleScreen> {
   }
 
   void _showHintDialog(BuildContext context) {
+    final Locale locale = Localizations.localeOf(context);
+    final List<_HintItem> entries = <_HintItem>[];
+    final String hint1 = _localizedText(_levelData?['hint1'], locale);
+    final String hint2 = _localizedText(_levelData?['hint2'], locale);
+    final String solution =
+        _localizedText(_levelData?['solution_explanation'], locale);
+
+    if (hint1.isNotEmpty) entries.add(_HintItem('Hint 1', hint1));
+    if (hint2.isNotEmpty) entries.add(_HintItem('Hint 2', hint2));
+    if (solution.isNotEmpty) entries.add(_HintItem('Solution', solution));
+    int selected = 0;
+
     showDialog<void>(
       context: context,
       barrierColor: Colors.black.withOpacity(0.65),
@@ -319,69 +329,134 @@ class _LevelPuzzleScreenState extends State<LevelPuzzleScreen> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 420),
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.lg,
-                  vertical: AppSpacing.xl,
-                ),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 decoration: BoxDecoration(
                   color: AppColors.panel,
                   borderRadius: BorderRadius.circular(AppRadius.lg),
-                  border: Border.all(color: AppColors.goldAccent, width: 1.4),
+                  border: Border.all(color: AppColors.goldAccent, width: 1.2),
                   boxShadow: const <BoxShadow>[
                     BoxShadow(
                       color: Color(0x662C2410),
-                      blurRadius: 32,
-                      offset: Offset(0, 14),
+                      blurRadius: 28,
+                      offset: Offset(0, 12),
                     ),
                   ],
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Text(
-                      'Need Help?',
-                      style: AppTextStyles.heading2.copyWith(
-                        color: AppColors.textPrimary,
+                child: entries.isEmpty
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Text(
+                            'Bu seviye için ipucu bulunamadı.',
+                            style: AppTextStyles.body.copyWith(
+                              color: AppColors.textPrimary,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(
+                              'Kapat',
+                              style: AppTextStyles.buttonLabel.copyWith(
+                                color: AppColors.goldAccent,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                'Hints',
+                                style: AppTextStyles.heading2.copyWith(
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              Wrap(
+                                spacing: AppSpacing.sm,
+                                runSpacing: AppSpacing.sm,
+                                children: List<Widget>.generate(entries.length,
+                                    (int index) {
+                                  final bool isSelected = selected == index;
+                                  return ChoiceChip(
+                                    label: Text(
+                                      entries[index].label,
+                                      style: AppTextStyles.caption.copyWith(
+                                        color: isSelected
+                                            ? AppColors.background
+                                            : AppColors.textPrimary,
+                                      ),
+                                    ),
+                                    selected: isSelected,
+                                    onSelected: (bool _) {
+                                      setState(() {
+                                        selected = index;
+                                      });
+                                    },
+                                    selectedColor: AppColors.goldAccent,
+                                    backgroundColor: AppColors.keypadTile,
+                                    labelPadding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.sm,
+                                      vertical: AppSpacing.xs,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(AppRadius.md),
+                                      side: BorderSide(
+                                        color: isSelected
+                                            ? AppColors.goldAccent
+                                            : AppColors.panelBorder,
+                                      ),
+                                    ),
+                                  );
+                                }),
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              Container(
+                                width: double.infinity,
+                                constraints:
+                                    const BoxConstraints(maxHeight: 280),
+                                padding: const EdgeInsets.all(AppSpacing.md),
+                                decoration: BoxDecoration(
+                                  color: AppColors.keypadTile,
+                                  borderRadius:
+                                      BorderRadius.circular(AppRadius.md),
+                                  border: Border.all(
+                                    color: AppColors.panelBorder,
+                                  ),
+                                ),
+                                child: SingleChildScrollView(
+                                  child: Text(
+                                    entries[selected].value,
+                                    style: AppTextStyles.body.copyWith(
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text(
+                                    'Kapat',
+                                    style: AppTextStyles.buttonLabel.copyWith(
+                                      color: AppColors.goldAccent,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: AppSpacing.xl),
-                    _HintOptionButton(
-                      icon: Icons.ondemand_video,
-                      title: 'Watch Ads for',
-                      accent: 'Hint',
-                      onTap: () => Navigator.pop(context),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    _HintOptionButton(
-                      icon: Icons.ondemand_video,
-                      title: 'Watch Ads for',
-                      accent: 'Solution',
-                      onTap: () => Navigator.pop(context),
-                    ),
-                    const SizedBox(height: AppSpacing.xl),
-                    Text(
-                      'OR',
-                      style: AppTextStyles.heading3.copyWith(
-                        color: AppColors.goldAccent,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xl),
-                    _PremiumButton(onTap: () => Navigator.pop(context)),
-                    const SizedBox(height: AppSpacing.lg),
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Text(
-                        'No, thanks',
-                        style: AppTextStyles.body.copyWith(
-                          color: AppColors.mutedText,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
               ),
             ),
           ),
@@ -391,103 +466,46 @@ class _LevelPuzzleScreenState extends State<LevelPuzzleScreen> {
   }
 }
 
-class _HintOptionButton extends StatelessWidget {
-  const _HintOptionButton({
-    required this.icon,
-    required this.title,
-    required this.accent,
-    required this.onTap,
-  });
+class _HintItem {
+  _HintItem(this.label, this.value);
 
-  final IconData icon;
-  final String title;
-  final String accent;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm + 2,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.keypadTile,
-          borderRadius: BorderRadius.circular(AppRadius.md),
-          border: Border.all(color: AppColors.panelBorder),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Icon(icon, color: AppColors.mutedText, size: 26),
-                const SizedBox(width: AppSpacing.sm),
-                Text(
-                  title,
-                  style: AppTextStyles.body.copyWith(
-                    color: AppColors.mutedText,
-                  ),
-                ),
-              ],
-            ),
-            Text(
-              accent,
-              style: AppTextStyles.heading3.copyWith(
-                color: AppColors.textPrimary,
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  final String label;
+  final String value;
 }
 
-class _PremiumButton extends StatelessWidget {
-  const _PremiumButton({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(
-          vertical: AppSpacing.md,
-          horizontal: AppSpacing.lg,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.keypadTileHighlight,
-          borderRadius: BorderRadius.circular(AppRadius.md),
-          border: Border.all(color: AppColors.goldAccent, width: 1.2),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(
-              Icons.workspace_premium_outlined,
-              color: AppColors.goldAccent,
-              size: 22,
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            Text(
-              'Be Premium',
-              style: AppTextStyles.buttonLabel.copyWith(
-                color: AppColors.goldAccent,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+String _localizedText(dynamic raw, Locale locale) {
+  if (raw == null) return '';
+  if (raw is Map) {
+    final Object? direct = raw[locale.languageCode];
+    if (direct != null && direct.toString().trim().isNotEmpty) {
+      return direct.toString().trim();
+    }
+    final Object? en = raw['en'];
+    if (en != null && en.toString().trim().isNotEmpty) {
+      return en.toString().trim();
+    }
+    for (final Object? value in raw.values) {
+      if (value != null && value.toString().trim().isNotEmpty) {
+        return value.toString().trim();
+      }
+    }
+    return '';
   }
+
+  final String str = raw.toString().trim();
+  if (str.isEmpty) return '';
+  // Try decode JSON-like string to pick locale-specific content
+  if (str.startsWith('{') && str.endsWith('}')) {
+    try {
+      final Object? decoded = jsonDecode(str);
+      if (decoded is Map<String, dynamic>) {
+        return _localizedText(decoded, locale);
+      }
+    } catch (_) {
+      // fall through to return raw string
+    }
+  }
+  return str;
 }
 
 class _FooterMetaBar extends StatelessWidget {

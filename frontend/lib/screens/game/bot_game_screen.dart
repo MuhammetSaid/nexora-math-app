@@ -235,16 +235,10 @@ class _BotGameScreenState extends State<BotGameScreen> {
                     answerListenable: _answer,
                     onClearLast: _answer.removeLast,
                     onClearAll: _answer.clear,
-                    onHint: () => _showHintDialog(context),
                     onEnter: _handleAnswer,
                     answerLabel: l10n.answerLabel,
                     enterLabel: l10n.enter,
-                    hintLabel: l10n.hint,
                     answer: _levelData?['answer_value']?.toString() ?? '',
-                    hint1: _levelData?['hint1']?.toString() ?? '',
-                    hint2: _levelData?['hint2']?.toString() ?? '',
-                    solutionExplanation:
-                        _levelData?['solution_explanation']?.toString() ?? '',
                     useCustomHandler: true, // Bot oyunu için özel handler
                   ),
                   const SizedBox(height: AppSpacing.sm),
@@ -1098,56 +1092,7 @@ class _BotGameScreenState extends State<BotGameScreen> {
     );
   }
 
-  void _showHintDialog(BuildContext context) {
-    showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.all(AppSpacing.xl),
-            decoration: BoxDecoration(
-              color: AppColors.panel,
-              borderRadius: BorderRadius.circular(AppRadius.lg),
-              border: Border.all(color: AppColors.goldAccent, width: 1.4),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'İpucu Kullan',
-                  style: AppTextStyles.heading2.copyWith(
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  'Bot oyununda ipucu kullanılamaz!',
-                  style: AppTextStyles.body.copyWith(
-                    color: AppColors.mutedText,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.goldAccent,
-                  ),
-                  child: Text(
-                    'Tamam',
-                    style: AppTextStyles.buttonLabel.copyWith(
-                      color: AppColors.background,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
+
 }
 
 class _FooterMetaBar extends StatelessWidget {

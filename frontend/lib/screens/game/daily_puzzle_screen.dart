@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
@@ -77,6 +78,153 @@ class _DailyPuzzleScreenState extends State<DailyPuzzleScreen> {
   void dispose() {
     _answer.dispose();
     super.dispose();
+  }
+
+  void _showHintDialog(BuildContext context) {
+    final Locale locale = Localizations.localeOf(context);
+    final String hint1 = _localizedText(_levelData?['hint1'], locale);
+    final String hint2 = _localizedText(_levelData?['hint2'], locale);
+    final String solution =
+        _localizedText(_levelData?['solution_explanation'], locale);
+    int selected = 0;
+    final List<_HintItem> entries = <_HintItem>[
+      if (hint1.isNotEmpty) _HintItem('Hint 1', hint1),
+      if (hint2.isNotEmpty) _HintItem('Hint 2', hint2),
+      if (solution.isNotEmpty) _HintItem('Solution', solution),
+    ];
+    final bool hasAny = entries.isNotEmpty;
+
+    showDialog<void>(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.65),
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            decoration: BoxDecoration(
+              color: AppColors.panel,
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              border: Border.all(color: AppColors.goldAccent, width: 1.4),
+            ),
+            child: hasAny
+                ? StatefulBuilder(
+                    builder: (BuildContext context, StateSetter setState) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            'Hints',
+                            style: AppTextStyles.heading2.copyWith(
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          Wrap(
+                            spacing: AppSpacing.sm,
+                            runSpacing: AppSpacing.sm,
+                            children: List<Widget>.generate(
+                              entries.length,
+                              (int index) {
+                                final bool isSelected = selected == index;
+                                return ChoiceChip(
+                                  label: Text(
+                                    entries[index].label,
+                                    style: AppTextStyles.caption.copyWith(
+                                      color: isSelected
+                                          ? AppColors.background
+                                          : AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  selected: isSelected,
+                                  onSelected: (_) {
+                                    setState(() => selected = index);
+                                  },
+                                  selectedColor: AppColors.goldAccent,
+                                  backgroundColor: AppColors.keypadTile,
+                                  labelPadding: const EdgeInsets.symmetric(
+                                    horizontal: AppSpacing.sm,
+                                    vertical: AppSpacing.xs,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.circular(AppRadius.md),
+                                    side: BorderSide(
+                                      color: isSelected
+                                          ? AppColors.goldAccent
+                                          : AppColors.panelBorder,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          Container(
+                            width: double.infinity,
+                            constraints:
+                                const BoxConstraints(maxHeight: 280),
+                            padding: const EdgeInsets.all(AppSpacing.md),
+                            decoration: BoxDecoration(
+                              color: AppColors.keypadTile,
+                              borderRadius:
+                                  BorderRadius.circular(AppRadius.md),
+                              border: Border.all(color: AppColors.panelBorder),
+                            ),
+                            child: SingleChildScrollView(
+                              child: Text(
+                                entries[selected].value,
+                                style: AppTextStyles.body.copyWith(
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: Text(
+                                'Kapat',
+                                style: AppTextStyles.buttonLabel.copyWith(
+                                  color: AppColors.goldAccent,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  )
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text(
+                        'Bu seviye için ipucu bulunamadı.',
+                        style: AppTextStyles.body.copyWith(
+                          color: AppColors.textPrimary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(
+                          'Tamam',
+                          style: AppTextStyles.buttonLabel.copyWith(
+                            color: AppColors.goldAccent,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -211,16 +359,12 @@ class _DailyPuzzleScreenState extends State<DailyPuzzleScreen> {
                   answerListenable: _answer,
                   onClearLast: _answer.removeLast,
                   onClearAll: _answer.clear,
-                  onHint: () => _showSoonSnack(context, l10n),
+                  onHint: () => _showHintDialog(context),
                   onEnter: () => _showSoonSnack(context, l10n),
                   answerLabel: l10n.answerLabel,
                   enterLabel: l10n.enter,
                   hintLabel: l10n.hint,
                   answer: _levelData?['answer_value']?.toString() ?? '',
-                  hint1: _levelData?['hint1']?.toString() ?? '',
-                  hint2: _levelData?['hint2']?.toString() ?? '',
-                  solutionExplanation:
-                      _levelData?['solution_explanation']?.toString() ?? '',
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 NumericKeypad(
@@ -254,4 +398,45 @@ class _DailyPuzzleScreenState extends State<DailyPuzzleScreen> {
       ),
     );
   }
+}
+
+class _HintItem {
+  _HintItem(this.label, this.value);
+
+  final String label;
+  final String value;
+}
+
+String _localizedText(dynamic raw, Locale locale) {
+  if (raw == null) return '';
+  if (raw is Map) {
+    final Object? direct = raw[locale.languageCode];
+    if (direct != null && direct.toString().trim().isNotEmpty) {
+      return direct.toString().trim();
+    }
+    final Object? en = raw['en'];
+    if (en != null && en.toString().trim().isNotEmpty) {
+      return en.toString().trim();
+    }
+    for (final Object? value in raw.values) {
+      if (value != null && value.toString().trim().isNotEmpty) {
+        return value.toString().trim();
+      }
+    }
+    return '';
+  }
+
+  final String str = raw.toString().trim();
+  if (str.isEmpty) return '';
+  if (str.startsWith('{') && str.endsWith('}')) {
+    try {
+      final Object? decoded = jsonDecode(str);
+      if (decoded is Map<String, dynamic>) {
+        return _localizedText(decoded, locale);
+      }
+    } catch (_) {
+      // ignore and return raw string
+    }
+  }
+  return str;
 }
