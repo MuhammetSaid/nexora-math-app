@@ -48,26 +48,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 Center(
-                  child: SizedBox(
-                    width: 180,
-                    height: 180,
-                    child: Image.asset(
-                      'assets/images/orbital.png',
-                      fit: BoxFit.contain,
-                      cacheWidth: 180,
-                      cacheHeight: 180,
-                      errorBuilder:
-                          (
-                            BuildContext context,
-                            Object error,
-                            StackTrace? stackTrace,
-                          ) {
-                            return const Icon(
-                              Icons.language_outlined,
-                              color: AppColors.goldAccent,
-                              size: 72,
-                            );
-                          },
+                  child: Container(
+                    width: 200,
+                    height: 200,
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: AppColors.background.withOpacity(0.35),
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      child: Image.asset(
+                        'assets/images/orbital.png',
+                        fit: BoxFit.contain,
+                        filterQuality: FilterQuality.high,
+                        errorBuilder:
+                            (
+                              BuildContext context,
+                              Object error,
+                              StackTrace? stackTrace,
+                            ) {
+                          return const Icon(
+                            Icons.language_outlined,
+                            color: AppColors.goldAccent,
+                            size: 72,
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),

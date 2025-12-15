@@ -76,13 +76,13 @@ class _GameModeScreenState extends State<GameModeScreen> {
                           onTap: (context) async {
                             final UserProfile? updated =
                                 await Navigator.of(context).push<UserProfile?>(
-                              MaterialPageRoute(
-                                builder: (context) => LevelsScreen(
-                                  profile: _profile,
-                                  onProfileUpdated: _handleProfileUpdated,
-                                ),
-                              ),
-                            );
+                                  MaterialPageRoute(
+                                    builder: (context) => LevelsScreen(
+                                      profile: _profile,
+                                      onProfileUpdated: _handleProfileUpdated,
+                                    ),
+                                  ),
+                                );
                             if (!mounted) return;
                             if (updated != null) {
                               _handleProfileUpdated(updated);
@@ -97,6 +97,7 @@ class _GameModeScreenState extends State<GameModeScreen> {
                             Color(0x4D6B4CE6),
                             Color(0x339B6CE6),
                           ],
+
                           onTap: (context) {
                             Navigator.of(context).push(
                               MaterialPageRoute(
@@ -187,10 +188,12 @@ class _GameModeScreenState extends State<GameModeScreen> {
   }
 
   Widget _buildProfileCard(BuildContext context, UserProfile? user) {
-    final String displayName =
-        (user?.name.isNotEmpty ?? false) ? user!.name : 'Guest';
-    final String diamondText =
-        NumberFormat.decimalPattern().format(user?.diamond ?? 0);
+    final String displayName = (user?.name.isNotEmpty ?? false)
+        ? user!.name
+        : 'Guest';
+    final String diamondText = NumberFormat.decimalPattern().format(
+      user?.diamond ?? 0,
+    );
 
     return RepaintBoundary(
       child: GestureDetector(
@@ -199,7 +202,10 @@ class _GameModeScreenState extends State<GameModeScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppColors.gold.withOpacity(0.3), width: 2),
+            border: Border.all(
+              color: AppColors.gold.withOpacity(0.3),
+              width: 2,
+            ),
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -287,57 +293,51 @@ class _GameModeScreenState extends State<GameModeScreen> {
   }) {
     final String subtitleText = subtitle == null ? title : '$title $subtitle';
 
-    return Builder(
-      builder: (context) => GestureDetector(
-        onTap: onTap != null ? () => onTap(context) : null,
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.gold.withOpacity(0.4), width: 1),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: gradientColors,
-            ),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(15),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(color: Color(0x33E5E5E5)),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(icon, color: Colors.white, size: 36),
-                    const Spacer(),
-                    Text(
-                      subtitleText,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1,
+    return GestureDetector(
+      onTap: onTap != null ? () => onTap(context) : null,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppColors.gold.withOpacity(0.4), width: 1),
+          color: Color(0x1EFFFFFF),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(15),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(icon, color: Colors.white, size: 36),
+                  const Spacer(),
+                  Text(
+                    subtitleText,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1,
+                    ),
+                  ),
+
+                  if (showProgress) ...[
+                    const SizedBox(height: 12),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: LinearProgressIndicator(
+                        value: progressValue,
+                        backgroundColor: Colors.white.withOpacity(0.2),
+                        valueColor: const AlwaysStoppedAnimation<Color>(
+                          Color(0xFFFF9F43),
+                        ),
+                        minHeight: 6,
                       ),
                     ),
-                    if (showProgress) ...[
-                      const SizedBox(height: 12),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: LinearProgressIndicator(
-                          value: progressValue,
-                          backgroundColor: const Color(0x33FFFFFF),
-                          valueColor: const AlwaysStoppedAnimation<Color>(
-                            AppColors.goldAccent,
-                          ),
-                          minHeight: 6,
-                        ),
-                      ),
-                    ],
                   ],
-                ),
+                ],
               ),
             ),
           ),
@@ -389,11 +389,7 @@ class _GameModeScreenState extends State<GameModeScreen> {
     );
   }
 
-  Widget _buildLevelIndicator(
-    String level,
-    bool isActive, {
-    String? subtitle,
-  }) {
+  Widget _buildLevelIndicator(String level, bool isActive, {String? subtitle}) {
     return Row(
       children: [
         Container(
@@ -555,17 +551,16 @@ class _GameModeScreenState extends State<GameModeScreen> {
   void _openProfile(BuildContext context) {
     Navigator.of(context)
         .push<UserProfile?>(
-      MaterialPageRoute<UserProfile?>(
-        builder: (context) => ProfileSettingsScreen(
-          onProfileChanged: _handleProfileUpdated,
-        ),
-      ),
-    )
+          MaterialPageRoute<UserProfile?>(
+            builder: (context) =>
+                ProfileSettingsScreen(onProfileChanged: _handleProfileUpdated),
+          ),
+        )
         .then((UserProfile? value) {
-      if (value != null) {
-        _handleProfileUpdated(value);
-      }
-    });
+          if (value != null) {
+            _handleProfileUpdated(value);
+          }
+        });
   }
 
   Widget _buildBottomNavigation(BuildContext context) {

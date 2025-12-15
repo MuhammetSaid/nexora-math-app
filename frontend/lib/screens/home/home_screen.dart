@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:frontend/l10n/app_localizations.dart';
 
@@ -7,8 +9,8 @@ import '../../services/storage/profile_storage.dart';
 import '../../theme/colors.dart';
 import '../../theme/text_styles.dart';
 import '../../utils/constants.dart';
-import '../../widgets/common/glow_button.dart';
 import '../../widgets/auth/login_dialog.dart';
+import '../../widgets/game/nexora_background.dart';
 import '../settings/settings_screen.dart';
 import '../game/game_mode_screen.dart';
 
@@ -76,146 +78,153 @@ class _HomeScreenState extends State<HomeScreen> {
     final ThemeData theme = Theme.of(context);
 
     return Scaffold(
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            final double minHeight =
-                (constraints.maxHeight -
-                        MediaQuery.of(context).padding.vertical)
-                    .clamp(0, double.infinity);
-            return Center(
-              child: SingleChildScrollView(
-                padding: AppSpacing.page(),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: 520,
-                    minHeight: minHeight,
-                  ),
-                  child: IntrinsicHeight(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            const SizedBox(height: AppSpacing.xl),
-                            Text(
-                              l10n.homeTitle,
-                              style: AppTextStyles.headline.copyWith(
-                                color: AppColors.gold,
-                                letterSpacing: 1.4,
-                                shadows: const <Shadow>[
-                                  Shadow(
-                                    color: AppColors.shadow,
-                                    blurRadius: 4,
-                                    offset: Offset(0, 2),
+      body: NexoraBackground(
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              final double minHeight =
+                  (constraints.maxHeight -
+                          MediaQuery.of(context).padding.vertical)
+                      .clamp(0, double.infinity);
+              return Center(
+                child: SingleChildScrollView(
+                  padding: AppSpacing.page(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: 520,
+                      minHeight: minHeight,
+                    ),
+                    child: IntrinsicHeight(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              const SizedBox(height: AppSpacing.xl),
+                              Text(
+                                l10n.homeTitle,
+                                style: AppTextStyles.headline.copyWith(
+                                  color: AppColors.gold,
+                                  letterSpacing: 1.4,
+                                  shadows: const <Shadow>[
+                                    Shadow(
+                                      color: AppColors.shadow,
+                                      blurRadius: 4,
+                                      offset: Offset(0, 2),
+                                    ),
+                                    Shadow(
+                                      color: AppColors.gold,
+                                      blurRadius: 8,
+                                      offset: Offset(0, 0),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.xl),
+                              const _OrbitalBadge(),
+                              const SizedBox(height: AppSpacing.xxl + 8),
+                              SizedBox(
+                                width: double.infinity,
+                                child: _HomeActionButton(
+                                  label: l10n.startGame,
+                                  icon: Icons.play_arrow_rounded,
+                                  isPrimary: true,
+                                  onTap: () async {
+                                    if (_activeProfile == null) {
+                                      await _openLoginModal();
+                                    }
+                                    if (_activeProfile == null || !mounted) return;
+                                    final UserProfile? result =
+                                        await Navigator.of(context)
+                                            .push<UserProfile?>(
+                                      MaterialPageRoute(
+                                        builder: (context) => GameModeScreen(
+                                          profile: _activeProfile,
+                                          onProfileUpdated:
+                                              _handleProfileUpdated,
+                                        ),
+                                      ),
+                                    );
+                                    if (result != null) {
+                                      _handleProfileUpdated(result);
+                                    }
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.xxl + 8),
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: _HomeActionButton(
+                                      label: l10n.chapters,
+                                      icon: Icons.menu_book_outlined,
+                                      onTap: () => _showComingSoon(context),
+                                    ),
                                   ),
-                                  Shadow(
-                                    color: AppColors.gold,
-                                    blurRadius: 8,
-                                    offset: Offset(0, 0),
+                                  const SizedBox(width: AppSpacing.md),
+                                  Expanded(
+                                    child: _HomeActionButton(
+                                      label: l10n.endlessMode,
+                                      icon: Icons.all_inclusive,
+                                      onTap: () => _showComingSoon(context),
+                                    ),
                                   ),
                                 ],
                               ),
-                            ),
-                            const SizedBox(height: AppSpacing.xl),
-                            const _OrbitalBadge(),
-                            const SizedBox(height: AppSpacing.xxl + 8),
-                            GlowButton(
-                              label: l10n.startGame,
-                              height: 68,
-                              onTap: () async {
-                                if (_activeProfile == null) {
-                                  await _openLoginModal();
-                                }
-                                if (_activeProfile == null || !mounted) return;
-                                final UserProfile? result =
-                                    await Navigator.of(context).push<UserProfile?>(
-                                  MaterialPageRoute(
-                                    builder: (context) => GameModeScreen(
-                                      profile: _activeProfile,
-                                      onProfileUpdated: _handleProfileUpdated,
-                                    ),
+                            ],
+                          ),
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              _BottomMetaRow(
+                                items: <_BottomMeta>[
+                                  const _BottomMeta(
+                                    icon: Icons.psychology_outlined,
+                                    label: 'IQ',
                                   ),
-                                );
-                                if (result != null) {
-                                  _handleProfileUpdated(result);
-                                }
-                              },
-                            ),
-                            const SizedBox(height: AppSpacing.xxl + 8),
-                            Row(
-                              children: <Widget>[
-                                Expanded(
-                                  child: GlowButton(
-                                    height: 56,
-                                    label: l10n.chapters,
-                                    icon: Icons.menu_book_outlined,
-                                    onTap: () => _showComingSoon(context),
+                                  const _BottomMeta(
+                                    icon: Icons.emoji_events_outlined,
+                                    label: 'Leaderboard',
                                   ),
-                                ),
-                                const SizedBox(width: AppSpacing.md),
-                                Expanded(
-                                  child: MutedButton(
-                                    label: l10n.endlessMode,
-                                    icon: Icons.all_inclusive,
-                                    onTap: () => _showComingSoon(context),
+                                  _BottomMeta(
+                                    icon: Icons.settings_outlined,
+                                    label: 'Settings',
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const SettingsScreen(),
+                                        ),
+                                      );
+                                    },
                                   ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            _BottomMetaRow(
-                              items: <_BottomMeta>[
-                                const _BottomMeta(
-                                  icon: Icons.psychology_outlined,
-                                  label: 'IQ',
-                                ),
-                                const _BottomMeta(
-                                  icon: Icons.emoji_events_outlined,
-                                  label: 'Leaderboard',
-                                ),
-                                _BottomMeta(
-                                  icon: Icons.settings_outlined,
-                                  label: 'Settings',
-                                  onTap: () {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const SettingsScreen(),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                _BottomMeta(
-                                  icon: Icons.account_circle_outlined,
-                                  label: 'Session',
-                                  onTap: _openLoginModal,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            Text(
-                              l10n.comingSoon,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: AppColors.textSecondary,
+                                  _BottomMeta(
+                                    icon: Icons.account_circle_outlined,
+                                    label: 'Session',
+                                    onTap: _openLoginModal,
+                                  ),
+                                ],
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ],
+                              const SizedBox(height: AppSpacing.md),
+                              Text(
+                                l10n.comingSoon,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: AppColors.textSecondary,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );
@@ -246,6 +255,80 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+/// Home CTA buttons styled to mirror the Settings screen cards.
+class _HomeActionButton extends StatelessWidget {
+  const _HomeActionButton({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+    this.isPrimary = false,
+  });
+
+  final String label;
+  final IconData icon;
+  final FutureOr<void> Function() onTap;
+  final bool isPrimary;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextStyle textStyle = (isPrimary
+            ? AppTextStyles.heading2
+            : AppTextStyles.heading3)
+        .copyWith(
+      color: AppColors.textPrimary,
+      letterSpacing: isPrimary ? 0.6 : 0.4,
+    );
+
+    return GestureDetector(
+      onTap: () {
+        try {
+          onTap();
+        } catch (error) {
+          debugPrint('HomeActionButton tap failed: $error');
+        }
+      },
+      child: Container(
+        height: isPrimary ? 72 : 56,
+        padding: EdgeInsets.symmetric(
+          vertical: isPrimary ? AppSpacing.md : AppSpacing.sm,
+          horizontal: AppSpacing.lg,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.keypadTile,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          border: Border.all(color: AppColors.goldAccent, width: 1.2),
+          boxShadow: const <BoxShadow>[
+            BoxShadow(
+              color: Color(0x332C2410),
+              blurRadius: 12,
+              offset: Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Icon(
+              icon,
+              color: AppColors.goldAccent,
+              size: isPrimary ? 26 : 22,
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Flexible(
+              child: Text(
+                label,
+                style: textStyle,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 /// Central icon badge to mimic the geometric graphic in the reference.
 class _OrbitalBadge extends StatelessWidget {
   const _OrbitalBadge();
@@ -255,26 +338,27 @@ class _OrbitalBadge extends StatelessWidget {
     return Container(
       width: 220,
       height: 220,
-      decoration: const BoxDecoration(color: AppColors.background),
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: AppColors.background.withOpacity(0.35),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+      ),
       child: Center(
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           child: Image.asset(
             'assets/images/orbital.png',
-            width: 280,
-            height: 250,
             fit: BoxFit.contain,
-            cacheWidth: 250,
-            cacheHeight: 250,
+            filterQuality: FilterQuality.high,
             errorBuilder:
                 (BuildContext context, Object error, StackTrace? stackTrace) {
-                  debugPrint('Orbital asset missing: $error');
-                  return const Icon(
-                    Icons.language,
-                    color: AppColors.goldSoft,
-                    size: 88,
-                  );
-                },
+              debugPrint('Orbital asset missing: $error');
+              return const Icon(
+                Icons.language,
+                color: AppColors.goldSoft,
+                size: 88,
+              );
+            },
           ),
         ),
       ),
