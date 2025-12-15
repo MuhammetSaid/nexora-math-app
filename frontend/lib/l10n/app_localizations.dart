@@ -194,6 +194,126 @@ abstract class AppLocalizations {
   /// **'Profile Settings'**
   String get profileSettings;
 
+  /// No description provided for @changeAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Avatar'**
+  String get changeAvatar;
+
+  /// No description provided for @loginAnotherAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Log in with another account'**
+  String get loginAnotherAccount;
+
+  /// No description provided for @loginTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get loginTitle;
+
+  /// No description provided for @loginSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email and password to continue.'**
+  String get loginSubtitle;
+
+  /// No description provided for @loginButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get loginButton;
+
+  /// No description provided for @loginCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get loginCancel;
+
+  /// No description provided for @loginInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Email or password is incorrect'**
+  String get loginInvalid;
+
+  /// No description provided for @loginFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Login failed, please try again'**
+  String get loginFailed;
+
+  /// No description provided for @profileName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get profileName;
+
+  /// No description provided for @profileEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get profileEmail;
+
+  /// No description provided for @profilePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get profilePassword;
+
+  /// No description provided for @passwordOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave blank to keep current password'**
+  String get passwordOptional;
+
+  /// No description provided for @saveProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Profile'**
+  String get saveProfile;
+
+  /// No description provided for @profileSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile saved'**
+  String get profileSaved;
+
+  /// No description provided for @profileSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save profile'**
+  String get profileSaveFailed;
+
+  /// No description provided for @clearedProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile cache cleared'**
+  String get clearedProfile;
+
+  /// No description provided for @nameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Name is required'**
+  String get nameRequired;
+
+  /// No description provided for @emailRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Email is required'**
+  String get emailRequired;
+
+  /// No description provided for @invalidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email'**
+  String get invalidEmail;
+
+  /// No description provided for @passwordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is required'**
+  String get passwordRequired;
+
   /// No description provided for @achievements.
   ///
   /// In en, this message translates to:

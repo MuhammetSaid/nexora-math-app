@@ -1,10 +1,10 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
+import 'dart:async';
 import '../../l10n/app_localizations.dart';
-import '../../models/game/puzzle.dart';
-import '../../services/game/puzzle_repository.dart';
 import '../../services/api/level_service.dart';
+import '../../services/api/bot_service.dart';
 import '../../theme/colors.dart';
 import '../../theme/text_styles.dart';
 import '../../utils/constants.dart';
@@ -45,6 +45,17 @@ class _BotGameScreenState extends State<BotGameScreen> {
   bool _isLoading = true; // Yükleniyor mu?
   bool _hasError = false; // Hata var mı?
 
+  // Yarış sistemi için
+  bool _botSolving = false; // Bot çözüyor mu?
+  bool _questionSolved = false; // Soru çözüldü mü? (ilk çözen için)
+  String? _botAnswer; // Bot'un cevabı
+  double _botSolveTime = 0.0; // Bot'un çözüm süresi
+  Timer? _botTimer; // Bot çözüm timer'ı
+  Future<Map<String, dynamic>?>? _botSolveFuture; // Bot çözüm future'ı
+  String _botCurrentMessage = ''; // Bot'un şu anki mesajı
+  List<String> _botThinkingMessages = []; // Bot'un düşünme mesajları
+  String _botSolvedMessage = ''; // Bot'un çözdükten sonraki mesajı
+
   @override
   void initState() {
     super.initState();
@@ -54,6 +65,7 @@ class _BotGameScreenState extends State<BotGameScreen> {
   @override
   void dispose() {
     _answer.dispose();
+    _botTimer?.cancel();
     super.dispose();
   }
 
@@ -90,9 +102,26 @@ class _BotGameScreenState extends State<BotGameScreen> {
         setState(() {
           _levelData = levelData;
           _isLoading = false;
+          _questionSolved = false; // Yeni soru için sıfırla
+          _botSolving = false;
+          _botAnswer = null;
+          _botSolveTime = 0.0;
+          _botCurrentMessage = '';
+          _botThinkingMessages = [];
+          _botSolvedMessage = '';
+          _answer.clear();
         });
         print('✅ Level $_currentLevel başarıyla yüklendi');
         print('📝 Cevap: ${levelData['answer_value']}');
+
+        // Bot çözümünü başlat (yarış başlıyor!)
+        try {
+          _startBotSolving();
+        } catch (e, stackTrace) {
+          print('❌ Bot çözüm başlatma hatası: $e');
+          print('Stack trace: $stackTrace');
+          // Hata olsa bile oyun devam etsin
+        }
       } else {
         setState(() {
           _isLoading = false;
@@ -111,142 +140,165 @@ class _BotGameScreenState extends State<BotGameScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context);
-    return Scaffold(
-      body: NexoraBackground(
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg,
-              vertical: AppSpacing.lg,
-            ),
-            child: Column(
-              children: <Widget>[
-                // Özel Bot AppBar
-                _buildBotAppBar(),
-                const SizedBox(height: AppSpacing.md),
+    try {
+      final AppLocalizations l10n = AppLocalizations.of(context);
+      return Scaffold(
+        body: NexoraBackground(
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.lg,
+              ),
+              child: Column(
+                children: <Widget>[
+                  // Özel Bot AppBar
+                  _buildBotAppBar(),
+                  const SizedBox(height: AppSpacing.md),
 
-                // Skor Göstergesi (5 kutu)
-                _buildScoreIndicator(),
-                const SizedBox(height: AppSpacing.lg),
+                  // Skor Göstergesi (5 kutu)
+                  _buildScoreIndicator(),
+                  const SizedBox(height: AppSpacing.lg),
 
-                // Puzzle Card
-                Expanded(
-                  child: _isLoading
-                      ? Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.panel.withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(AppRadius.lg),
-                          ),
-                          child: Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    widget.difficultyColor,
-                                  ),
-                                ),
-                                const SizedBox(height: AppSpacing.md),
-                                Text(
-                                  'Soru yükleniyor...',
-                                  style: AppTextStyles.body.copyWith(
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                              ],
+                  // Puzzle Card
+                  Expanded(
+                    child: _isLoading
+                        ? Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.panel.withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(AppRadius.lg),
                             ),
-                          ),
-                        )
-                      : _hasError
-                      ? Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.panel.withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(AppRadius.lg),
-                          ),
-                          child: Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.error_outline,
-                                  color: AppColors.error,
-                                  size: 48,
-                                ),
-                                const SizedBox(height: AppSpacing.md),
-                                Text(
-                                  'Soru yüklenemedi',
-                                  style: AppTextStyles.heading3.copyWith(
-                                    color: AppColors.textPrimary,
+                            child: Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      widget.difficultyColor,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: AppSpacing.md),
-                                ElevatedButton(
-                                  onPressed: _loadRandomLevel,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: widget.difficultyColor,
+                                  const SizedBox(height: AppSpacing.md),
+                                  Text(
+                                    'Soru yükleniyor...',
+                                    style: AppTextStyles.body.copyWith(
+                                      color: AppColors.textPrimary,
+                                    ),
                                   ),
-                                  child: const Text('Tekrar Dene'),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
+                          )
+                        : _hasError
+                        ? Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.panel.withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(AppRadius.lg),
+                            ),
+                            child: Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.error_outline,
+                                    color: AppColors.error,
+                                    size: 48,
+                                  ),
+                                  const SizedBox(height: AppSpacing.md),
+                                  Text(
+                                    'Soru yüklenemedi',
+                                    style: AppTextStyles.heading3.copyWith(
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: AppSpacing.md),
+                                  ElevatedButton(
+                                    onPressed: _loadRandomLevel,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: widget.difficultyColor,
+                                    ),
+                                    child: const Text('Tekrar Dene'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        : PuzzleCard(
+                            lines: const [], // Backend'den gelecek
+                            imagePath: _levelData?['image_path'] ?? '',
+                            level: _currentLevel,
                           ),
-                        )
-                      : PuzzleCard(
-                          lines: const [], // Backend'den gelecek
-                          imagePath: _levelData?['image_path'] ?? '',
-                          level: _currentLevel,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+
+                  // Answer Bar
+                  AnswerBar(
+                    answerListenable: _answer,
+                    onClearLast: _answer.removeLast,
+                    onClearAll: _answer.clear,
+                    onHint: () => _showHintDialog(context),
+                    onEnter: _handleAnswer,
+                    answerLabel: l10n.answerLabel,
+                    enterLabel: l10n.enter,
+                    hintLabel: l10n.hint,
+                    answer: _levelData?['answer_value']?.toString() ?? '',
+                    hint1: _levelData?['hint1']?.toString() ?? '',
+                    hint2: _levelData?['hint2']?.toString() ?? '',
+                    solutionExplanation:
+                        _levelData?['solution_explanation']?.toString() ?? '',
+                    useCustomHandler: true, // Bot oyunu için özel handler
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+
+                  // Numeric Keypad
+                  NumericKeypad(
+                    layout: const <List<String>>[
+                      <String>['1', '2', '3', '4', '5'],
+                      <String>['6', '7', '8', '9', '0'],
+                    ],
+                    highlightedValues: const <String>{},
+                    onKeyTap: _answer.append,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+
+                  // Footer
+                  _FooterMetaBar(
+                    onSettingsTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) => const SettingsScreen(),
                         ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-
-                // Answer Bar
-                AnswerBar(
-                  answerListenable: _answer,
-                  onClearLast: _answer.removeLast,
-                  onClearAll: _answer.clear,
-                  onHint: () => _showHintDialog(context),
-                  onEnter: _handleAnswer,
-                  answerLabel: l10n.answerLabel,
-                  enterLabel: l10n.enter,
-                  hintLabel: l10n.hint,
-                  answer: _levelData?['answer_value']?.toString() ?? '',
-                  hint1: _levelData?['hint1']?.toString() ?? '',
-                  hint2: _levelData?['hint2']?.toString() ?? '',
-                  solutionExplanation:
-                      _levelData?['solution_explanation']?.toString() ?? '',
-                  useCustomHandler: true, // Bot oyunu için özel handler
-                ),
-                const SizedBox(height: AppSpacing.sm),
-
-                // Numeric Keypad
-                NumericKeypad(
-                  layout: const <List<String>>[
-                    <String>['1', '2', '3', '4', '5'],
-                    <String>['6', '7', '8', '9', '0'],
-                  ],
-                  highlightedValues: const <String>{},
-                  onKeyTap: _answer.append,
-                ),
-                const SizedBox(height: AppSpacing.md),
-
-                // Footer
-                _FooterMetaBar(
-                  onSettingsTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute<void>(
-                        builder: (_) => const SettingsScreen(),
-                      ),
-                    );
-                  },
-                ),
-              ],
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
+    } catch (e, stackTrace) {
+      print('❌ Build hatası: $e');
+      print('Stack trace: $stackTrace');
+      // Hata durumunda basit bir hata ekranı göster
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 64, color: Colors.red),
+              const SizedBox(height: 16),
+              Text('Bir hata oluştu: $e'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => Navigator.maybePop(context),
+                child: const Text('Geri Dön'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
   }
 
   Widget _buildBotAppBar() {
@@ -352,29 +404,79 @@ class _BotGameScreenState extends State<BotGameScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Bot
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: widget.difficultyColor.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(8),
+              Flexible(
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: _botSolving
+                            ? widget.difficultyColor.withOpacity(0.4)
+                            : widget.difficultyColor.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
+                        border: _botSolving
+                            ? Border.all(
+                                color: widget.difficultyColor,
+                                width: 2,
+                              )
+                            : null,
+                      ),
+                      child: _botSolving
+                          ? SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  widget.difficultyColor,
+                                ),
+                              ),
+                            )
+                          : Icon(
+                              Icons.smart_toy_rounded,
+                              color: widget.difficultyColor,
+                              size: 20,
+                            ),
                     ),
-                    child: Icon(
-                      Icons.smart_toy_rounded,
-                      color: widget.difficultyColor,
-                      size: 20,
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Bot',
+                            style: AppTextStyles.body.copyWith(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          if (_botSolving && _botCurrentMessage.isNotEmpty)
+                            Text(
+                              _botCurrentMessage,
+                              style: AppTextStyles.caption.copyWith(
+                                color: widget.difficultyColor,
+                                fontSize: 10,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            )
+                          else if (_botCurrentMessage.isNotEmpty &&
+                              !_botSolving)
+                            Text(
+                              _botCurrentMessage,
+                              style: AppTextStyles.caption.copyWith(
+                                color: widget.difficultyColor,
+                                fontSize: 10,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Bot',
-                    style: AppTextStyles.body.copyWith(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
 
               // Skor
@@ -469,6 +571,148 @@ class _BotGameScreenState extends State<BotGameScreen> {
     );
   }
 
+  /// Bot çözümünü başlatır (yarış başlar!)
+  void _startBotSolving() {
+    if (_levelData == null) {
+      print('⚠️ Level data null, bot çözümü başlatılamıyor');
+      return;
+    }
+
+    try {
+      if (!mounted) return;
+
+      setState(() {
+        _botSolving = true;
+        _botCurrentMessage = 'Soruyu inceliyorum... 🤖';
+      });
+
+      print('🤖 Bot çözümü başlatıldı...');
+
+      // Bot çözümünü başlat
+      _botSolveFuture = BotService.solveQuestion(
+        levelId: _levelData!['level_id'] ?? '',
+        difficulty: widget.difficulty,
+        hint1: _levelData!['hint1'] ?? '',
+        hint2: _levelData!['hint2'] ?? '',
+        solutionExplanation: _levelData!['solution_explanation'] ?? '',
+        answerValue: _levelData!['answer_value']?.toString() ?? '',
+      );
+
+      // Bot çözümünü dinle - düşünme mesajlarını göster
+      _simulateBotThinking();
+
+      // Bot çözümünü dinle
+      _botSolveFuture!
+          .then((result) {
+            if (result != null && mounted && !_questionSolved) {
+              // Soru henüz çözülmediyse bot'un cevabını kontrol et
+              _handleBotAnswer(result);
+            }
+          })
+          .catchError((error, stackTrace) {
+            print('❌ Bot çözüm hatası: $error');
+            print('Stack trace: $stackTrace');
+            if (mounted) {
+              setState(() {
+                _botSolving = false;
+                _botCurrentMessage = '';
+              });
+            }
+          });
+    } catch (e, stackTrace) {
+      print('❌ _startBotSolving exception: $e');
+      print('Stack trace: $stackTrace');
+      if (mounted) {
+        setState(() {
+          _botSolving = false;
+          _botCurrentMessage = '';
+        });
+      }
+    }
+  }
+
+  /// Bot'un düşünme sürecini simüle eder (mesajları gösterir)
+  void _simulateBotThinking() {
+    // Düşünme mesajları backend'den gelecek, şimdilik timer ile simüle et
+    int messageIndex = 0;
+    const thinkingMessages = [
+      'Hmm, ilginç bir soru... 🤔',
+      'Bir dakika, düşüneyim... 💭',
+      'Bu biraz zormuş gibi görünüyor 😅',
+      'İpuçlarına bakayım... 🔍',
+      'Bekle, çözüyorum... ⚙️',
+      'Ah, şimdi anladım! 💡',
+    ];
+
+    _botTimer?.cancel();
+    _botTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
+      if (!mounted || !_botSolving || _questionSolved) {
+        timer.cancel();
+        return;
+      }
+
+      if (messageIndex < thinkingMessages.length) {
+        setState(() {
+          _botCurrentMessage = thinkingMessages[messageIndex];
+        });
+        messageIndex++;
+      }
+    });
+  }
+
+  /// Bot'un cevabını işler
+  void _handleBotAnswer(Map<String, dynamic> botResult) {
+    if (_questionSolved) return; // Soru zaten çözüldü
+
+    _botTimer?.cancel(); // Timer'ı durdur
+
+    final String botAnswer = botResult['answer']?.toString() ?? '';
+    final String correctAnswer = _levelData!['answer_value']?.toString() ?? '';
+    final double solveTime = (botResult['solve_time'] ?? 0.0).toDouble();
+
+    // Backend'den gelen mesajları al
+    final List<dynamic> thinkingMsgs = botResult['thinking_messages'] ?? [];
+    final String solvedMsg = botResult['solved_message']?.toString() ?? '';
+
+    print('🤖 Bot cevap verdi: $botAnswer');
+    print('🤖 Bot çözüm süresi: ${solveTime}s');
+
+    if (botAnswer == correctAnswer) {
+      // Bot doğru cevabı buldu!
+      setState(() {
+        _questionSolved = true;
+        _botSolving = false;
+        _botAnswer = botAnswer;
+        _botSolveTime = solveTime;
+        _botCurrentMessage = solvedMsg.isNotEmpty
+            ? solvedMsg
+            : 'Çözdüm! $solveTime saniyede! 🎉';
+        _botThinkingMessages = thinkingMsgs.map((e) => e.toString()).toList();
+        _botSolvedMessage = solvedMsg;
+        _botScore++;
+        _currentRound++;
+      });
+
+      print('🤖 Bot DOĞRU cevabı buldu!');
+      print('🤖 Bot mesajı: ${_botCurrentMessage}');
+      print(
+        '📊 YENİ SKOR - Oyuncu: $_playerScore, Bot: $_botScore, Tur: $_currentRound',
+      );
+
+      // Bot kazandı dialogunu göster
+      _showResultDialog(false, botWon: true);
+    } else {
+      // Bot yanlış cevap verdi, çözüm devam ediyor
+      setState(() {
+        _botSolving = false;
+        _botAnswer = botAnswer;
+        _botCurrentMessage = '';
+      });
+      print('🤖 Bot yanlış cevap verdi, yarış devam ediyor...');
+    }
+  }
+
+  /// Kullanıcı cevabını işler (yarış mantığı ile)
   void _handleAnswer() {
     print('🔵 _handleAnswer() ÇAĞRILDI!');
     print(
@@ -480,15 +724,17 @@ class _BotGameScreenState extends State<BotGameScreen> {
       return;
     }
 
+    if (_questionSolved) {
+      print('⚠️ Soru zaten çözüldü!');
+      return;
+    }
+
     final String correctAnswer = _levelData!['answer_value']?.toString() ?? '';
     final String userAnswer = _answer.value.trim();
 
     print('🎯 Cevap kontrol ediliyor...');
     print('   Kullanıcı cevabı: "$userAnswer"');
     print('   Doğru cevap: "$correctAnswer"');
-    print(
-      '   Uzunluklar - Kullanıcı: ${userAnswer.length}, Doğru: ${correctAnswer.length}',
-    );
 
     if (userAnswer.isEmpty) {
       print('⚠️ Boş cevap!');
@@ -501,11 +747,12 @@ class _BotGameScreenState extends State<BotGameScreen> {
 
     // Cevap kontrolü
     if (userAnswer == correctAnswer) {
-      // Doğru cevap - Oyuncu puan kazandı
-      print('✅ DOĞRU CEVAP!');
-      print('   Önceki skor: $_playerScore, Önceki tur: $_currentRound');
+      // Doğru cevap - Oyuncu ilk çözdü ve puan kazandı!
+      print('✅ OYUNCU DOĞRU CEVAP VERDİ!');
 
       setState(() {
+        _questionSolved = true; // Soru çözüldü, bot artık cevap veremez
+        _botSolving = false;
         _playerScore++;
         _currentRound++;
       });
@@ -515,27 +762,85 @@ class _BotGameScreenState extends State<BotGameScreen> {
       );
       print('🎭 Dialog gösteriliyor...');
 
-      _showResultDialog(true);
+      _showResultDialog(true, playerWon: true);
     } else {
-      // Yanlış cevap - Bot puan kazandı
-      print('❌ YANLIŞ CEVAP!');
-      print('   Önceki skor: $_botScore, Önceki tur: $_currentRound');
+      // Yanlış cevap - Bot hala çözebilir, oyuncu tekrar deneyebilir
+      print('❌ YANLIŞ CEVAP! Bot çözmeye devam ediyor...');
 
-      setState(() {
-        _botScore++;
-        _currentRound++;
-      });
-
-      print(
-        '📊 YENİ SKOR - Oyuncu: $_playerScore, Bot: $_botScore, Tur: $_currentRound',
-      );
-      print('🎭 Dialog gösteriliyor...');
-
-      _showResultDialog(false);
+      // Yanlış cevap dialogu göster ama puan kazanma!
+      _showWrongAnswerDialog();
     }
   }
 
-  void _showResultDialog(bool isCorrect) {
+  /// Yanlış cevap dialogu (puan kazanılmaz, yarış devam eder)
+  void _showWrongAnswerDialog() {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            decoration: BoxDecoration(
+              color: AppColors.panel,
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              border: Border.all(color: Colors.redAccent, width: 2),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.close, color: Colors.redAccent, size: 64),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  'Yanlış Cevap!',
+                  style: AppTextStyles.heading2.copyWith(
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  'Tekrar deneyin! Bot hala çözmeye çalışıyor...',
+                  style: AppTextStyles.body.copyWith(
+                    color: AppColors.mutedText,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.redAccent,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.xl,
+                      vertical: AppSpacing.md,
+                    ),
+                  ),
+                  child: Text(
+                    'Devam Et',
+                    style: AppTextStyles.buttonLabel.copyWith(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Sonuç dialogu (doğru cevap veya bot kazandı)
+  void _showResultDialog(
+    bool isPlayerCorrect, {
+    bool playerWon = false,
+    bool botWon = false,
+  }) {
+    final bool actualWin = playerWon || (isPlayerCorrect && !botWon);
+
     showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -548,7 +853,7 @@ class _BotGameScreenState extends State<BotGameScreen> {
               color: AppColors.panel,
               borderRadius: BorderRadius.circular(AppRadius.lg),
               border: Border.all(
-                color: isCorrect
+                color: actualWin
                     ? const Color(0xFF4CAF50)
                     : widget.difficultyColor,
                 width: 2,
@@ -558,26 +863,59 @@ class _BotGameScreenState extends State<BotGameScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  isCorrect ? Icons.check_circle : Icons.cancel,
-                  color: isCorrect
+                  actualWin ? Icons.check_circle : Icons.smart_toy_rounded,
+                  color: actualWin
                       ? const Color(0xFF4CAF50)
                       : widget.difficultyColor,
                   size: 64,
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Text(
-                  isCorrect ? 'Doğru Cevap!' : 'Yanlış Cevap!',
+                  actualWin ? 'Kazandınız! 🎉' : 'Bot Kazandı! 🤖',
                   style: AppTextStyles.heading2.copyWith(
                     color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  isCorrect ? 'Bir puan kazandınız!' : 'Bot bir puan kazandı!',
+                  actualWin
+                      ? 'Bir puan kazandınız!'
+                      : 'Bot soruyu sizden önce çözdü!',
                   style: AppTextStyles.body.copyWith(
                     color: AppColors.mutedText,
                   ),
+                  textAlign: TextAlign.center,
                 ),
+                if (botWon && _botSolvedMessage.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: widget.difficultyColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      border: Border.all(
+                        color: widget.difficultyColor.withOpacity(0.3),
+                      ),
+                    ),
+                    child: Text(
+                      _botSolvedMessage,
+                      style: AppTextStyles.body.copyWith(
+                        color: AppColors.textPrimary,
+                        fontStyle: FontStyle.italic,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ] else if (botWon && _botSolveTime > 0) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    'Bot ${_botSolveTime.toStringAsFixed(1)} saniyede çözdü',
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.mutedText,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
                 const SizedBox(height: AppSpacing.lg),
                 ElevatedButton(
                   onPressed: () async {
