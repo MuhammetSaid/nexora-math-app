@@ -69,7 +69,9 @@ class BotService:
     def _get_thinking_messages(self) -> list:
         """Bot'un düşünme sırasında söyleyebileceği mesajlar"""
         import random
-        messages = [
+        
+        # LLM olmadığında kullanılacak temel mesajlar
+        fallback_messages = [
             "Hmm, ilginç bir soru... 🤔",
             "Bir dakika, düşüneyim... 💭",
             "Bu biraz zormuş gibi görünüyor 😅",
@@ -79,7 +81,46 @@ class BotService:
             "Ah, şimdi anladım! 💡",
             "Bir saniye, hesaplıyorum... 🧮",
         ]
-        return random.sample(messages, min(3, len(messages)))
+        
+        # LLM'den dinamik mesaj üretmeyi dene
+        if self.llm:
+            try:
+                prompt = (
+                    "Matematik sorusu çözerken kullanıcıya gösterilecek "
+                    "3 kısa, neşeli, Türkçe düşünme mesajı üret. "
+                    "Emoji ekleyebilirsin. Sadece JSON dizi olarak döndür."
+                )
+                
+                if HumanMessage and SystemMessage:
+                    messages = [
+                        SystemMessage(content="Sen bir oyun botusun, oyuncuya eğlenceli bekleme mesajları ver."),
+                        HumanMessage(content=prompt)
+                    ]
+                else:
+                    messages = [
+                        {"role": "system", "content": "Sen bir oyun botusun, oyuncuya eğlenceli bekleme mesajları ver."},
+                        {"role": "user", "content": prompt}
+                    ]
+                
+                response = self.llm.invoke(messages)
+                content = getattr(response, "content", str(response)).strip()
+                
+                generated = []
+                # JSON array dönerse parse et, değilse satır bazlı ayır
+                try:
+                    generated = json.loads(content)
+                except Exception:
+                    generated = [part.strip(" -") for part in re.split(r"[\n;]+", content) if part.strip()]
+                
+                # Çok uzun veya boş olmayan ilk 3 mesajı al
+                generated = [msg for msg in generated if msg and len(msg) <= 120]
+                if generated:
+                    print(f" LLM düşünme mesajı: {generated}")
+                    return generated[:3]
+            except Exception as e:
+                print(f" LLM düşünme mesajı üretilemedi: {e}")
+        
+        return random.sample(fallback_messages, min(3, len(fallback_messages)))
     
     def _get_solved_message(self, success: bool, solve_time: float) -> str:
         """Bot'un çözdükten sonra söyleyebileceği mesajlar"""
@@ -103,20 +144,20 @@ class BotService:
         """
         Seviyeye göre temel çözüm süresini hesaplar (saniye cinsinden)
         
-        Seviye 1 (Başlangıç): 10-15 saniye (kolay, ama gerçekçi)
-        Seviye 2 (Amatör): 8-12 saniye
-        Seviye 3 (Orta): 7-10 saniye
-        Seviye 4 (İleri): 6-9 saniye
-        Seviye 5 (Uzman): 5-8 saniye (hızlı ama zor sorular için yavaş)
+        Seviye 1 (Başlangıç): 30-35 saniye (kolay, ama gerçekçi)
+        Seviye 2 (Amatör): 25-30 saniye
+        Seviye 3 (Orta): 20-25 saniye
+        Seviye 4 (İleri): 15-20 saniye
+        Seviye 5 (Uzman): 5-10 saniye (hızlı ama zor sorular için yavaş)
         """
         import random
         
         base_times = {
-            1: (10.0, 15.0),  # Başlangıç: 10-15 saniye (daha gerçekçi)
-            2: (8.0, 12.0),   # Amatör: 8-12 saniye
-            3: (7.0, 10.0),   # Orta: 7-10 saniye
-            4: (6.0, 9.0),    # İleri: 6-9 saniye
-            5: (5.0, 8.0),    # Uzman: 5-8 saniye
+            1: (30.0, 35.0),  # Başlangıç: 30-35 saniye (daha gerçekçi)
+            2: (25.0, 30.0),   # Amatör: 25-30 saniye
+            3: (20.0, 25.0),   # Orta: 20-25 saniye
+            4: (15.0, 20.0),    # İleri: 15-20 saniye
+            5: (5.0, 10.0),    # Uzman: 5-10 saniye
         }
         
         min_time, max_time = base_times.get(difficulty, (7.0, 10.0))
