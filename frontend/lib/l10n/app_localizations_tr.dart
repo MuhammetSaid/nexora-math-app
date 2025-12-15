@@ -15,16 +15,16 @@ class AppLocalizationsTr extends AppLocalizations {
   String get homeTitle => 'NEXORA';
 
   @override
-  String get startGame => 'Oyuna BaYla';
+  String get startGame => 'Oyuna Başla';
 
   @override
-  String get chapters => 'BÇôlÇ¬mler';
+  String get chapters => 'Bölümler';
 
   @override
   String get endlessMode => 'Sonsuz Mod';
 
   @override
-  String get comingSoon => 'YakŽñnda';
+  String get comingSoon => 'Yakında';
 
   @override
   String get bottomIq => 'IQ';
@@ -50,19 +50,19 @@ class AppLocalizationsTr extends AppLocalizations {
   String get enter => 'Enter';
 
   @override
-  String get hint => 'Žøpucu';
+  String get hint => 'İpucu';
 
   @override
   String get settings => 'Ayarlar';
 
   @override
-  String get profileSettings => 'Profil AyarlarŽñ';
+  String get profileSettings => 'Profil Ayarları';
 
   @override
-  String get changeAvatar => 'AvatarŽñ DeŽYiYtir';
+  String get changeAvatar => 'Avatarını Değiştir';
 
   @override
-  String get loginAnotherAccount => 'BaYka bir hesapla giriY yap';
+  String get loginAnotherAccount => 'Başka bir hesapla giriş yap';
 
   @override
   String get loginTitle => 'Giriş yap';
@@ -83,16 +83,16 @@ class AppLocalizationsTr extends AppLocalizations {
   String get loginFailed => 'Giriş yapılamadı, lütfen tekrar dene';
 
   @override
-  String get profileName => 'Žøsim';
+  String get profileName => 'İsim';
 
   @override
   String get profileEmail => 'E-posta';
 
   @override
-  String get profilePassword => '?ifre';
+  String get profilePassword => 'Şifre';
 
   @override
-  String get passwordOptional => 'Mevcut Yifreyi korumak iÇõin boY bŽñrak';
+  String get passwordOptional => 'Mevcut şifreyi korumak için boş bırak';
 
   @override
   String get saveProfile => 'Profili Kaydet';
@@ -104,46 +104,46 @@ class AppLocalizationsTr extends AppLocalizations {
   String get profileSaveFailed => 'Profil kaydedilemedi';
 
   @override
-  String get clearedProfile => 'Profil ÇônbelleŽYi temizlendi';
+  String get clearedProfile => 'Profil önbelleği temizlendi';
 
   @override
-  String get nameRequired => 'Žøsim gerekli';
+  String get nameRequired => 'İsim gerekli';
 
   @override
   String get emailRequired => 'E-posta gerekli';
 
   @override
-  String get invalidEmail => 'GeÇõerli bir e-posta girin';
+  String get invalidEmail => 'Geçerli bir e-posta girin';
 
   @override
-  String get passwordRequired => '?ifre gerekli';
+  String get passwordRequired => 'Şifre gerekli';
 
   @override
-  String get achievements => 'BaYarŽñlar';
+  String get achievements => 'Başarılar';
 
   @override
   String get language => 'Dil';
 
   @override
-  String get soundsOn => 'Ses AÇõŽñk';
+  String get soundsOn => 'Ses Açık';
 
   @override
-  String get soundsOff => 'Ses KapalŽñ';
+  String get soundsOff => 'Ses Kapalı';
 
   @override
   String get deleteData => 'Verileri Sil';
 
   @override
-  String get privacyPolicy => 'Gizlilik PolitikasŽñ';
+  String get privacyPolicy => 'Gizlilik Politikası';
 
   @override
-  String get termsOfService => 'KullanŽñm ?artlarŽñ';
+  String get termsOfService => 'Kullanım Şartları';
 
   @override
-  String get dialogPlaceholder => 'ŽøÇõerik yakŽñnda.';
+  String get dialogPlaceholder => 'İçerik yakında.';
 
   @override
-  String get dailyPuzzle => 'GÇ¬nlÇ¬k Soru';
+  String get dailyPuzzle => 'Günlük Soru';
 
   @override
   String get levelMode => 'Seviyeler';

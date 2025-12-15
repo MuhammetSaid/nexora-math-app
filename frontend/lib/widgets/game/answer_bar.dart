@@ -11,33 +11,27 @@ class AnswerBar extends StatelessWidget {
     required this.answerListenable,
     required this.onClearLast,
     required this.onClearAll,
-    required this.onHint,
     required this.onEnter,
     this.onCorrect,
     required this.answerLabel,
     required this.enterLabel,
-    required this.hintLabel,
     required this.answer,
-    required this.hint1,
-    required this.hint2,
-    required this.solutionExplanation,
+    this.onHint,
+    this.hintLabel,
     this.useCustomHandler = false, // Bot oyunu için
   });
 
   final ValueListenable<String> answerListenable;
   final VoidCallback onClearLast;
   final VoidCallback onClearAll;
-  final VoidCallback onHint;
   final VoidCallback onEnter;
   final VoidCallback? onCorrect;
   final String answerLabel;
   final String enterLabel;
-  final String hintLabel;
   final String answer;
-  final String hint1;
-  final String hint2;
-  final String solutionExplanation;
-  final bool useCustomHandler; // true ise onEnter callback'ini çağır
+  final VoidCallback? onHint;
+  final String? hintLabel;
+  final bool useCustomHandler; // true ise onEnter callback'ini çağırır
 
   @override
   Widget build(BuildContext context) {
@@ -68,12 +62,15 @@ class AnswerBar extends StatelessWidget {
             tooltip: null,
           ),
           const SizedBox(width: AppSpacing.sm),
-          _SquareButton(
-            icon: Icons.lightbulb_outline_rounded,
-            onTap: onHint,
-            tooltip: hintLabel,
-          ),
-          const SizedBox(width: AppSpacing.sm),
+          if (onHint != null)
+            _SquareButton(
+              icon: Icons.lightbulb_outline_rounded,
+              onTap: onHint!,
+              tooltip: hintLabel,
+            )
+          else
+            const SizedBox.shrink(),
+          if (onHint != null) const SizedBox(width: AppSpacing.sm),
           _EnterButton(label: enterLabel, onTap: () => _handleEnter(context)),
         ],
       ),
@@ -83,7 +80,7 @@ class AnswerBar extends StatelessWidget {
   void _handleEnter(BuildContext context) {
     // Bot oyunu gibi özel durumlar için custom handler kullan
     if (useCustomHandler) {
-      onEnter(); // Parent'taki handler'ı çağır
+      onEnter(); // Parent'taki handler'ı çağırır
       return;
     }
 
@@ -219,7 +216,7 @@ class AnswerBar extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  'Tekrar deneyin veya ipucu alın',
+                  'Tekrar deneyin',
                   style: AppTextStyles.body.copyWith(
                     color: AppColors.mutedText,
                   ),
